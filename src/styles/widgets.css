@@ -1,0 +1,67 @@
+/* Button */
+.button{
+    width: 27px;
+    height: 27px;
+    text-align: center;
+    color: white;
+    line-height: 27px;
+    font-size: 13pt;
+}
+
+.button:hover{
+    background-color: rgb(82, 82, 87);
+}
+
+/* Horizontal Resizer */
+.horizontal-resizer{
+    height: 7px;
+    background-color: rgb(108, 107, 114);
+    position: relative;
+}
+
+.horizontal-resizer:hover{
+    cursor: ns-resize;
+}
+
+.horizontal-resizer i{
+    transform: scaleX(1.5);
+    font-size: 7pt;
+    color: white;
+    position: absolute;
+    left: 48%;
+    top: -1px;
+}
+
+/* Vertical Resizer */
+.vertical-resizer{
+    width: 100%;
+    height: 100%;
+    background-color: rgb(108, 107, 114);
+    position: relative;
+}
+
+.vertical-resizer i{
+    top: 48.5%;
+    left: -1px;
+    z-index: 10;
+    position: absolute;
+    display: inline-block;
+    font-stretch: expanded;
+    color: white;
+    transform: rotate(90deg) scaleX(1.5);
+}
+
+/* Window Button */
+.window-button{
+    height: 28px;
+    width: 80px;
+    border-radius: 14px;
+    margin: 0 5px 0 5px;
+    outline: none;
+    color: rgb(217, 217, 217);
+    font-family: Montserrat-Regular;
+    border: 1px solid rgb(217, 217, 217);
+    background-color: transparent;
+    font-size: 9pt;
+    font-family: Montserrat;
+}
