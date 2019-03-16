@@ -14,9 +14,9 @@ export default {
     name: 'HueSlider',
     
     mounted(){
-        this.$refs.hueSliderSelector.addEventListener('mousedown', () => {
+        this.$refs.hueSliderSelector.onmousedown = () => {
             this.$store.state.activeElement = this.$refs.hueSliderSelector
-        })
+        }
         this.$refs.hueSliderSelector.mousemoveActions = this.updateSlider
         
 
@@ -38,7 +38,7 @@ export default {
             
             var hue = 360 - Math.round((selectorY + 10) * 360/256)
 
-            EventBus.$emit('update-color.hue', hue)
+            EventBus.$emit('update-hue', hue)
         }
     }
 }

@@ -8,7 +8,7 @@
             <div class="button fas fa-arrow-up " id="move-layer-up" @click="emitEvent('move-layer-up', selectedLayer)"></div>
             <div class="button fas fa-arrow-down " id="move-layer-down" @click="emitEvent('move-layer-down', selectedLayer)"></div>
         </div>
-        <div class="sidebar-window-body">
+        <div class="sidebar-window-body" :style="{ height: windowHeight + 'px' }" ref="windowBody">
             <ul>
                 <li 
                     v-for="layer in layers" 
@@ -26,7 +26,7 @@
                 </li>
             </ul>
         </div>
-        <div class="horizontal-resizer">
+        <div class="vertical-resizer" ref="resizer">
             <i class="fas fa-bars"></i>
         </div>
 
@@ -48,6 +48,25 @@ export default {
 
     components:{
         LayerManager
+    },
+
+    data(){
+        return {
+            mouseOffset: 0,
+            windowHeight: 150
+        }
+    },
+
+    mounted(){
+        this.$refs.resizer.onmousedown = () => {
+            this.mouseOffset = event.clientY - this.$refs.resizer.offsetTop
+            this.$store.state.activeElement = this.$refs.resizer
+        }
+
+        this.$refs.resizer.mousemoveActions = () => {
+            var windowHeight = event.clientY - this.$refs.windowBody.offsetTop - this.mouseOffset
+            this.windowHeight = windowHeight < 0 ? 0 : windowHeight
+        }
     },
 
     methods:{

@@ -1,12 +1,12 @@
 <template>
-  <div id="app" :style="[currentTool == 'hand' && {'cursor': 'grab'}]">
+  <div id="app" :style="[currentTool === 'hand' && {'cursor': 'grab'}]">
     <Toolbar/>
 
     <div id="editor">
       <SidebarLeft/>
       <div id="editor-center">
-        <CanvasArea/>
         <Animator/>
+        <CanvasArea/>
       </div>
       <SidebarRight/>
     </div>
@@ -14,6 +14,10 @@
     <div>
       <WindowManager/>
       <HistoryManager/>
+    </div>
+
+    <div id="draw-rect-info" :style="{ 'left': mousePos[0] + 20 + 'px', 'top': mousePos[1] + 20 + 'px' }" v-if="showDrawRectInfo">
+      <span>{{ `W: ${drawRectWidth} H: ${drawRectHeight}` }}</span>
     </div>
   </div>
 </template>
@@ -44,12 +48,18 @@ export default {
   },
 
   computed:{
-    currentTool(){ return this.$store.state.currentTool }
+    currentTool(){ return this.$store.state.currentTool },
+    showDrawRectInfo(){ return this.$store.state.showDrawRectInfo },
+    pixelPos(){ return this.$store.state.pixelPos },
+    mouseStart(){ return this.$store.state.mouseStart },
+    mousePos(){ return this.$store.state.mousePos },
+    drawRectWidth(){ return Math.abs(this.mouseStart[0] - this.pixelPos[0]) },
+    drawRectHeight(){ return Math.abs(this.mouseStart[0] - this.pixelPos[0]) }
   },
 
   data(){
     return {
-      fullscreen: false
+      fullscreen: false,
     }
   },
 
@@ -79,13 +89,30 @@ export default {
   grid-row: 2;
   display: grid;
   grid-template-columns: 90px 1fr auto;
-  height: 100%;
   box-shadow: 0px 1px 0px 0px black inset;
+  overflow: hidden;
 }
 
 #editor-center{
   display: grid;
   grid-template-rows: 1fr auto;
+}
+
+#draw-rect-info{
+    position: absolute;
+    height: 27px;
+    background-color: rgba(26, 27, 32, 0.7);
+    border: 1px solid white;
+    border-radius: 5px;
+    z-index: 10;
+}
+
+#draw-rect-info span{
+    margin-left: 4px;
+    margin-right: 4px;
+    line-height: 27px;
+    font-size: 9pt;
+    color: white;
 }
 </style>
 

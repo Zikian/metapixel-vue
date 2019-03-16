@@ -35,18 +35,29 @@ export default new Vuex.Store({
     selectedLayer: 0,
     layers:[],
 
-    canvasArea: null,
-    canvasAreaPos: { x: 90, y: 27},
-    canvas: null,
     canvasPos: { x: 0, y: 0 },
-    hiddenSize: [0, 0], //The amount by which the canvas is clipped by the canvas area on the top and left
+    hiddenSize: [0, 0],   //The amount by which the canvas is clipped by the canvas area on the top and left
     ctx: null,
+    
+    mouseStart: [0, 0],   //Initial position of the mouse when drawing a rectangle/ellipse/selection
+    showDrawRectInfo: false,
 
+    mousePos: [0, 0],
+    prevPixelPos: [0, 0],
+    pixelPos: [0, 0],     //Position of the mouse in unzoomed pixels, relative to the canvas
+    zoom: 0,
     brushSize: 1,
-    drawBuffer: [],
-    prevPixelPos: { x: 0, y: 0 },
-    pixelPos: { x: 0, y: 0 }, //Position of the mouse in unzoomed pixels, relative to the canvas
-    zoom: 0
+    
+    constants: {
+      canvasAreaPos: { x: 92, y: 29},
+      minSidebarRightWidth: 250,
+      maxSidebarRightWidth: 500,
+      maxAnimatorHeight: 600
+    },
+
+    elems: {
+      canvasArea: null,
+    }
 },
 
   getters: {
@@ -56,6 +67,11 @@ export default new Vuex.Store({
 
     currentLayer: state => {
       return state.layers[state.selectedLayer]
+    },
+
+    docSize: state => {
+      var document = state.documents[state.selectedDocument]
+      return { width: document.width, height: document.height }
     }
   }
 })

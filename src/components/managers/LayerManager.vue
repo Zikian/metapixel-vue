@@ -6,8 +6,7 @@ import EventBus from '../EventBus'
 export default {
     computed:{
         layers(){ return this.$store.state.layers },
-        docWidth(){ return this.$store.getters.currentDocument.width },
-        docHeight(){ return this.$store.getters.currentDocument.height },
+        docSize(){ return this.$store.getters.docSize },
 
         selectedLayer:{ 
             get(){ return this.$store.state.selectedLayer },
@@ -25,7 +24,7 @@ export default {
         })
 
         EventBus.$on('delete-layer', () => {
-            this.deleteLayer(this.selectLayer)
+            this.deleteLayer(this.selectedLayer)
         })
 
         EventBus.$on('toggle-layer-visibility', id => {
@@ -52,6 +51,7 @@ export default {
             this.layers[id].visible = !this.layers[id].visible
             EventBus.$emit('redraw-layers')
             EventBus.$emit('render-canvas')
+            EventBus.$emit('render-preview')
         },
 
         selectLayer(id){
@@ -69,8 +69,8 @@ export default {
             }
 
             newLayer.ctx = newLayer.canvas.getContext('2d')
-            newLayer.canvas.width = this.docWidth
-            newLayer.canvas.height = this.docHeight
+            newLayer.canvas.width = this.docSize.width
+            newLayer.canvas.height = this.docSize.height
             
             this.layers.unshift(newLayer)
             this.updateLayerIndices()
@@ -85,6 +85,7 @@ export default {
             this.selectLayer(0)
 
             EventBus.$emit('render-canvas')
+            EventBus.$emit('render-preview')
         },
 
         swapLayers(idA, idB){
@@ -95,6 +96,7 @@ export default {
             this.selectLayer(idB)
 
             EventBus.$emit('render-canvas')
+            EventBus.$emit('render-preview')
         },
 
         updateLayerIndices(){

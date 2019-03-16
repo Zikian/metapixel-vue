@@ -8,7 +8,7 @@
             <div class="button" id="anim-preview-zoom-in"><i class="fas fa-search-plus"></i></div>
             <div class="button" id="anim-preview-zoom-out"><i class="fas fa-search-minus"></i></div>
         </div>
-        <div class="vertical-resizer">
+        <div class="horizontal-resizer">
             <i class="fas fa-bars"></i>
         </div>
     </div>
@@ -29,13 +29,13 @@ export default {
     width: 250px;
 }
 
-#anim-preview .vertical-resizer{
+#anim-preview .horizontal-resizer{
     grid-column: 1;
     grid-row-start: 1;
     grid-row-end: 4;
 }
 
-#anim-preview .vertical-resizer i{
+#anim-preview .horizontal-resizer i{
     font-size: 7pt;
 }
 

@@ -64,6 +64,7 @@ export default {
             this.layers[this.targetLayer].opacity = opacity
             EventBus.$emit('redraw-layers')
             EventBus.$emit('render-canvas')
+            EventBus.$emit('render-preview')
         })
     },
 
@@ -79,8 +80,10 @@ export default {
         cancel(){
             this.layers[this.targetLayer].opacity = this.startOpacity
             this.opened = false
+            
             EventBus.$emit('redraw-layers')
             EventBus.$emit('render-canvas')
+            EventBus.$emit('render-preview')
         }
     },
 

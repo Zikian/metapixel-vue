@@ -9,7 +9,6 @@ export default {
     name: 'HandTool',
 
     computed:{
-        canvasAreaPos(){ return this.$store.state.canvasAreaPos },
         canvasPos(){ return this.$store.state.canvasPos },
         zoom(){ return this.$store.state.zoom }
     },
@@ -52,22 +51,9 @@ export default {
         },
 
         onExit(){
-            //Make sure that canvas position is not defined by floats (For drawing)
-            var hiddenX = Math.round(Math.min(0, this.canvasPos.x) / this.zoom)
-            var hiddenY = Math.round(Math.min(0, this.canvasPos.y) / this.zoom)
-            
-            if(hiddenX < 0){
-                this.canvasPos.x = hiddenX * this.zoom
-            }
-            if(hiddenY < 0){
-                this.canvasPos.y = hiddenY * this.zoom
-            }
-
-            this.$store.state.hiddenSize = [hiddenX, hiddenY]
+            EventBus.$emit('correct-canvas-position')
             EventBus.$emit('intersect-canvas')
         }
-
-
     }
 }
 </script>

@@ -1,9 +1,9 @@
 <template>
     <div id="animator">
-        <div class="horizontal-resizer" id="animator-resizer">
+        <div class="vertical-resizer" id="animator-resizer" ref="resizer">
             <i class="fas fa-bars"></i>
         </div>
-        <div id="animator-body">
+        <div id="animator-body" :style="{ 'height': animatorHeight + 'px' }" ref="animatorBody">
             <AnimationsWindow/>
             <FrameEditor/>
             <AnimationPreview/>
@@ -16,12 +16,39 @@ import AnimationsWindow from './AnimationsWindow'
 import FrameEditor from './FrameEditor'
 import AnimationPreview from './AnimationPreview'
 
+import EventBus from './EventBus'
+
 export default {
     name: 'Animator',
     components: {
         AnimationsWindow,
         FrameEditor,
         AnimationPreview
+    },
+
+    computed:{
+        maxAnimatorHeight(){ return this.$store.state.constants.maxAnimatorHeight }
+    },
+
+    data(){
+        return {
+            mouseOffset: 0,
+            animatorHeight: 225,
+        }
+    },
+
+    mounted(){
+        this.$refs.resizer.onmousedown = () => {
+            this.mouseOffset = this.$refs.animatorBody.offsetTop - event.clientY
+            this.$store.state.activeElement = this.$refs.resizer
+        }
+
+        this.$refs.resizer.mousemoveActions = () => {
+            var animatorHeight = document.body.offsetHeight - event.clientY - this.mouseOffset
+            this.animatorHeight = this.clamp(animatorHeight, 0, this.maxAnimatorHeight)
+
+            EventBus.$emit('update-visible-rect')
+        }
     }
 }
 </script>
@@ -31,12 +58,10 @@ export default {
     display: grid;
     grid-template-rows: 18px auto;
     grid-row: 2;
-    height: auto;
     border-left: 1px solid black;
 }
 
 #animator-body{
-    height: 225px;
     display: grid;
     grid-template-columns: auto 1fr auto;
 }

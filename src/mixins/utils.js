@@ -4,6 +4,20 @@ export default {
             return Math.max(a, Math.min(b, x));
         },
 
+        rectToSquare(x1, y1, x2, y2){
+            var dx = x2 - x1;   
+            var dy = y2 - y1;
+        
+            if(dx > 0 && dy > 0){
+                return [x1 + dx, y1 + dx];
+            } else if (dx > 0 && dy < 0){
+                return [x1 + dx, y1 - dx];
+            } else if (dx < 0 && dy < 0){
+                return [x1 + dx, y1 + dx];
+            }
+            return [x1 + dx, y1 - dx];
+        },
+
         RGBtoHSL(rgbArr){
             var r1 = rgbArr[0] / 255;
             var g1 = rgbArr[1] / 255;
@@ -145,6 +159,6 @@ export default {
 
         capitalizeFirstLetter(string){
             return string.charAt(0).toUpperCase() + string.slice(1)
-        },
+        }
     },
 };

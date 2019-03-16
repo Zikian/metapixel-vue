@@ -15,12 +15,13 @@ export default {
     computed:{
         pixelPos(){ return this.$store.state.pixelPos },
         canvasPos(){ return this.$store.state.canvasPos },
-        docWidth(){ return this.$store.getters.currentDocument.width },
-        docHeight(){ return this.$store.getters.currentDocument.height },
+        docSize(){ return this.$store.getters.docSize },
         zoom(){ return this.$store.state.zoom },
+        brushSize(){ return this.$store.state.brushSize },
         pixelSize(){ return this.brushSize * this.zoom },
         currentTool(){ return this.$store.state.currentTool },
         hiddenSize(){ return this.$store.state.hiddenSize },
+        primaryColor(){ return this.$store.state.color.primary },
 
         canvasStyle(){
             return { 
@@ -31,25 +32,28 @@ export default {
 
         mousePixelStyle(){
             return { 
-                'left': this.canvasPos.x + this.pixelPos.x * this.zoom + 'px', 
-                'top':  this.canvasPos.y + this.pixelPos.y * this.zoom + 'px', 
+                'left': this.canvasPos.x + this.pixelPos[0] * this.zoom + 'px', 
+                'top':  this.canvasPos.y + this.pixelPos[1] * this.zoom + 'px', 
                 'width': this.pixelSize + 'px', 
                 'height': this.pixelSize + 'px',
+                'background-color': this.currentTool != 'eraser' ? `rgba(${this.primaryColor.join()})`
+                                                                 : 'rgba(255,255,255,0.5)'
             }
         },
 
         displayMousePixel(){
-            var mouseOverCanvas = (this.pixelPos.x.isBetween(0, this.docWidth - 1) &&
-                                   this.pixelPos.y.isBetween(0, this.docHeight - 1))
+            var mouseOverCanvas = (this.pixelPos[0].isBetween(0, this.docSize.width - 1) &&
+                                   this.pixelPos[1].isBetween(0, this.docSize.height - 1))
             
             var tool = this.currentTool
             var validTool = (tool === 'draw' ||
-                             tool === 'erase' ||
+                             tool === 'eraser' ||
                              tool === 'mirrorx' ||
                              tool === 'mirrory' ||
                              tool === 'eyedropper' ||
                              tool === 'rectangle' ||
-                             tool === 'ellipse')
+                             tool === 'ellipse' ||
+                             tool === 'fill')
 
             return mouseOverCanvas && validTool
         }
@@ -63,11 +67,12 @@ export default {
 
 <style>
 #canvas-area{
+    box-sizing: border-box;
+    overflow: hidden;
     position: relative;
     grid-row: 1;
     background-color: rgb(26, 27, 32);
-    height: 100%;
-    box-shadow: inset 0px 0px 0px 2px black;
+    border: 2px solid black;
 }
 
 #draw-canvas{

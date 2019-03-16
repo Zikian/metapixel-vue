@@ -105,6 +105,11 @@ export default {
             this.$store.state.color.hex = value
             this.updateFromHex()
         })
+
+        EventBus.$on('update-color-from-eyedropper', value => {
+            this.updateAlpha(value[3])
+            this.updateFromRGB(value.slice(0, 3))
+        })
     },
 
     mounted(){
@@ -163,10 +168,14 @@ export default {
         hue(){ return this.$store.state.color.hue },
         saturation(){ return this.$store.state.color.saturation },
         lightness(){ return this.$store.state.color.lightness },
-        alpha(){ return this.$store.state.color.alpha },
         rgb(){ return this.$store.state.color.rgb },
         hex(){ return this.$store.state.color.hex },
         rgba(){ return `rgba(${this[this.selectedColor].join()})` },
+
+        alpha:{
+            get(){ return this.$store.state.color.alpha },
+            set(val){ this.$store.state.color.aplha = val } 
+        }
     },
     
     data(){
@@ -233,7 +242,11 @@ export default {
         },
 
         updateFromRGB(rgb){
-            rgb = rgb ? rgb : this.rgb
+            if(rgb){
+                this.updateRGB(rgb)
+            } else {
+                rgb = this.rgb
+            }
             this.updateHSL(rgb)
             this.updateHex(rgb)
             this.updateSelectedColor()
@@ -257,6 +270,10 @@ export default {
 
         updateSelectedColor(){
             this.$store.state.color[this.selectedColor] = [...this.rgb, this.alpha/255]
+        },
+
+        updateAlpha(alpha){
+            this.alpha = alpha
         },
 
         updateHSL(rgb){

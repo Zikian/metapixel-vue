@@ -3,15 +3,21 @@
         <Tool id="draw-tool" :icon="drawIcon" :toolname="'draw'"/>
         <DrawTool/>
         <Tool id="eraser-tool" :icon="eraserIcon" :toolname="'eraser'"/>
+        <EraserTool/>
         <Tool id="select-tool" :image="selectImage" :toolname="'select'"/>
         <Tool id="fill-tool" :icon="fillIcon" :toolname="'fill'"/>
+        <FillTool/>
         <Tool id="rectangle-tool" :icon="rectangleIcon" :toolname="'rectangle'"/>
+        <RectangleTool/>
         <Tool id="ellipse-tool" :image="ellipseImage" :toolname="'ellipse'"/>
+        <EllipseTool/>
         <Tool id="eyedropper-tool" :icon="eyedropperIcon" :toolname="'eyedropper'"/>
+        <EyedropperTool/>
         <Tool id="hand-tool" :icon="handTool" :toolname="'hand'"/>
         <HandTool/>
         <Tool id="horizontal-mirror-tool" :image="mirrorTool" :toolname="'mirrorx'"/>
         <Tool id="vertical-mirror-tool" :image="mirrorTool" :toolname="'mirrory'"/>
+        <MirrorTool/>
         <Tool id="tile-placer-tool" :image="tilePlacerTool" :toolname="'tile-placer'"/>
         <Tool id="tile-remover-tool" :image="tileRemoverTool" :toolname="'tile-remover'"/>
         <Tool id="animation-tool" :image="animTool" :toolname="'animation'"/>
@@ -21,7 +27,14 @@
 <script>
 import Tool from './Tool'
 import DrawTool from './tools/DrawTool'
+import EraserTool from './tools/EraserTool'
 import HandTool from './tools/HandTool'
+import RectangleTool from './tools/RectangleTool'
+import EllipseTool from './tools/EllipseTool'
+import FillTool from './tools/FillTool'
+import EyedropperTool from './tools/EyedropperTool'
+import MirrorTool from './tools/MirrorTool'
+
 import EventBus from './EventBus'
 
 export default {
@@ -29,13 +42,26 @@ export default {
 
     computed:{
         space(){ return this.$store.state.keys.space },
+        alt(){ return this.$store.state.keys.alt },
         prevTool(){ return this.$store.state.prevTool },
         currentTool(){ return this.$store.state.currentTool }
     },
 
     watch:{
         space(){
-            this.space ? this.switchTools('hand') : this.switchTools(this.prevTool)
+            if(this.space){
+                this.switchTools('hand')
+            } else if(this.currentTool === 'hand') {
+                this.switchTools(this.prevTool)
+            }
+        },
+
+        alt(){
+            if(this.alt){
+                this.switchTools('eyedropper')
+            } else if(this.currentTool === 'eyedropper') {
+                this.switchTools(this.prevTool)
+            }
         }
     },
 
@@ -74,7 +100,13 @@ export default {
     components:{
         Tool,
         DrawTool,
-        HandTool
+        HandTool,
+        EraserTool,
+        RectangleTool,
+        EllipseTool,
+        FillTool,
+        EyedropperTool,
+        MirrorTool
     }
 }
 </script>

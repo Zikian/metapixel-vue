@@ -6,7 +6,7 @@
                 <div class="button" id="add-anim"><i class="fas fa-plus"></i></div>
                 <div class="button" id="delete-anim"><i class="far fa-trash-alt"></i></div>
         </div>
-        <div class="vertical-resizer" 
+        <div class="horizontal-resizer" 
              @mousedown="resizing = true"
              @mouseup="resizing= false">
             <i class="fas fa-bars"></i>
@@ -38,13 +38,13 @@ export default {
     grid-template-columns: auto 7px;
 }
 
-#animations .vertical-resizer{
+#animations .horizontal-resizer{
     grid-column: 2;
     grid-row-start: 1;
     grid-row-end: 4;
 }
 
-#animations .vertical-resizer i{
+#animations .horizontal-resizer i{
     font-size: 7pt;
 }
 </style>
