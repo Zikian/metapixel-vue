@@ -29,7 +29,7 @@ export default {
     mounted(){
         this.$refs.resizer.onmousedown = () => {
             this.mouseOffset = event.clientY - this.$refs.resizer.offsetTop
-            this.$store.state.activeElement = this.$refs.resizer
+            this.$store.state.elems.activeElement = this.$refs.resizer
         }
 
         this.$refs.resizer.mousemoveActions = () => {

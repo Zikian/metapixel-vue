@@ -5,9 +5,10 @@
 <script>
 import EventBus from '../EventBus'
 import drawFunctions from '../../mixins/draw-functions'
+import baseTool from '../../mixins/baseTool'
 
 export default {
-    mixins: [drawFunctions],
+    mixins: [drawFunctions, baseTool],
 
     computed:{
         primaryColor(){ return this.$store.state.color.primary },
@@ -18,37 +19,19 @@ export default {
         mouseStart:{
             get(){ return this.$store.state.mouseStart },
             set(val){ this.$store.state.mouseStart = val }
-        }
+        },
     },
 
     data(){
         return {
             drawBuffer: [],
+            mouseEnd: [],
             isDrawingLine: false,
-            mouseEnd: []
         }
     },
 
-    mounted(){
-        EventBus.$on('draw-tool-mouseleft', () => {
-            this.mouseLeftActions()
-        })
-
-        EventBus.$on('draw-tool-mousedrag', () => {
-            this.mouseDragActions()
-        })
-
-        EventBus.$on('draw-tool-mouseup', () => {
-            this.mouseUpActions()
-        })
-
-        EventBus.$on('draw-tool-exit', () => {
-            this.onExit()   
-        })
-    },
-
     methods: {
-        mouseLeftActions(){
+        onMouseLeft(){
             this.isDrawingLine = this.shiftKey
             this.mouseStart = this.pixelPos.slice()
             this.mouseEnd = this.pixelPos.slice()
@@ -59,7 +42,7 @@ export default {
             EventBus.$emit('render-foreground')
         },
     
-        mouseDragActions(){
+        onMouseDrag(){
             if(this.isDrawingLine){
                 EventBus.$emit('render-background')
                 
@@ -74,7 +57,7 @@ export default {
             EventBus.$emit('render-foreground')
         },
     
-        mouseUpActions(){
+        onMouseUp(){
             if(this.isDrawingLine){
                 this.drawLine(...this.mouseStart, ...this.mouseEnd, this.primaryColor)
                 EventBus.$emit('render-foreground')
@@ -85,10 +68,6 @@ export default {
 
             EventBus.$emit('redraw-background')
             EventBus.$emit('render-preview')
-        },
-
-        onExit(){
-            this.drawBuffer = []
         }
     }
 }

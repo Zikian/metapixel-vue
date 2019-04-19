@@ -15,7 +15,7 @@
 import EventBus from './EventBus'
 
 export default {
-    name: 'Tool',
+    name: 'ToolButton',
 
     computed:{
         currentTool(){ return this.$store.state.currentTool },

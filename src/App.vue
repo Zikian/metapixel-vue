@@ -1,5 +1,8 @@
 <template>
-  <div id="app" :style="[currentTool === 'hand' && {'cursor': 'grab'}]">
+  <div 
+    id="app" 
+    :style="[currentTool === 'hand' && {'cursor': 'grab'}]"
+  >
     <Toolbar/>
 
     <div id="editor">
@@ -16,7 +19,11 @@
       <HistoryManager/>
     </div>
 
-    <div id="draw-rect-info" :style="{ 'left': mousePos[0] + 20 + 'px', 'top': mousePos[1] + 20 + 'px' }" v-if="showDrawRectInfo">
+    <div 
+      id="draw-rect-info" 
+      :style="{ 'left': mousePos[0] + 20 + 'px', 'top': mousePos[1] + 20 + 'px' }" 
+      v-if="showDrawRectInfo"
+    >
       <span>{{ `W: ${drawRectWidth} H: ${drawRectHeight}` }}</span>
     </div>
   </div>
@@ -49,12 +56,20 @@ export default {
 
   computed:{
     currentTool(){ return this.$store.state.currentTool },
-    showDrawRectInfo(){ return this.$store.state.showDrawRectInfo },
     pixelPos(){ return this.$store.state.pixelPos },
     mouseStart(){ return this.$store.state.mouseStart },
     mousePos(){ return this.$store.state.mousePos },
-    drawRectWidth(){ return Math.abs(this.mouseStart[0] - this.pixelPos[0]) },
-    drawRectHeight(){ return Math.abs(this.mouseStart[0] - this.pixelPos[0]) }
+    drawRectWidth(){ return Math.abs(this.mouseStart[0] - this.pixelPos[0]) + 1 },
+    drawRectHeight(){ return Math.abs(this.mouseStart[1] - this.pixelPos[1]) + 1 },
+    drawingSelection(){ return this.$store.state.selection.drawingSelection },
+    mouseDown(){ return this.$store.state.keys.mouseDown },
+
+    showDrawRectInfo(){ 
+      var validTool = (this.currentTool === 'rectangle' ||
+                       this.currentTool === 'ellipse')
+
+      return (this.mouseDown && validTool || this.drawingSelection)
+    },
   },
 
   data(){

@@ -15,13 +15,13 @@ export default {
 
     mounted(){
         this.$refs.colorSliderSelector.addEventListener('mousedown', () => {
-            this.$store.state.activeElement = this.$refs.colorSliderSelector
+            this.$store.state.elems.activeElement = this.$refs.colorSliderSelector
         })
         this.$refs.colorSliderSelector.mousemoveActions = this.updateSlider
         
 
         this.$refs.colorSlider.addEventListener('mousedown', () => {
-            this.$store.state.activeElement = this.$refs.colorSliderSelector
+            this.$store.state.elems.activeElement = this.$refs.colorSliderSelector
             this.updateSlider()
         })
     },

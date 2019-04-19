@@ -5,36 +5,29 @@
 <script>
 import EventBus from '../EventBus'
 import drawFunctions from '../../mixins/draw-functions'
+import baseTool from '../../mixins/baseTool'
 
 export default {
-    mixins: [drawFunctions],
+    mixins: [drawFunctions, baseTool],
 
     computed:{
         pixelPos(){ return this.$store.state.pixelPos },
+        shiftKey(){ return this.$store.state.keys.shift }
     },
 
     data(){
         return{
-            drawBuffer: []
+            drawBuffer: [],
+            isDrawingLine: false
         }
     },
 
-    mounted(){
-        EventBus.$on('eraser-tool-mouseleft', () => {
-            this.mouseLeftActions()
-        })
-
-        EventBus.$on('eraser-tool-mousedrag', () => {
-            this.mouseDragActions()
-        })
-
-        EventBus.$on('eraser-tool-mouseup', () => {
-            this.mouseUpActions()
-        })
-    },
-
     methods: {
-        mouseLeftActions(){
+        onMouseLeft(){
+            // this.isDrawingLine = this.shiftKey
+            // this.mouseStart = this.pixelPos.slice()
+            // this.mouseEnd = this.pixelPos.slice()
+
             this.drawBuffer.push(this.pixelPos)
             this.erasePixel(...this.pixelPos);
 
@@ -42,18 +35,32 @@ export default {
             EventBus.$emit('render-canvas')
         },
     
-        mouseDragActions(){
-            this.drawBuffer.push(this.pixelPos)
-            if (this.drawBuffer.length == 2){
-                this.drawLine(...this.drawBuffer[0], ...this.drawBuffer[1])
-                this.drawBuffer.shift()
+        onMouseDrag(){
+            if(this.isDrawingLine){
+                EventBus.$emit('render-background')
+                this.drawPreviewLine(...this.mouseStart, ...this.pixelPos)
+                this.mouseEnd = this.pixelPos.slice()
+                EventBus.$emit('render-foreground')
+            } else {
+                this.drawBuffer.push(this.pixelPos)
+                if (this.drawBuffer.length == 2){
+                    this.drawLine(...this.drawBuffer[0], ...this.drawBuffer[1])
+                    this.drawBuffer.shift()
+                }
+                EventBus.$emit('render-canvas')
             }
-            EventBus.$emit('redraw-layers')
-            EventBus.$emit('render-canvas')
+
         },
     
-        mouseUpActions(){
+        onMouseUp(){
+            if(this.isDrawingLine){
+                this.drawLine(...this.mouseStart, ...this.mouseEnd)
+                EventBus.$emit('render-foreground')
+                this.isDrawingLine = this.shiftKey
+            }
+
             this.drawBuffer = []
+            EventBus.$emit('redraw-layers')
             EventBus.$emit('render-preview')
         },
     }

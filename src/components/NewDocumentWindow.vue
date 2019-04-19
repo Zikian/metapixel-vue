@@ -9,34 +9,34 @@
             <div @click="docType = 1" :class="docType != 1 && 'tab-hidden'" >Tiled</div>
         </div>
         <div class="window-body">
-            <form id="single-image-settings" v-if="docType == 0">
+            <form id="single-image-settings" v-if="docType == 0" ref="form">
                 <div class="settings-wrapper">
                     <span>Document Name:</span>
-                    <input class="window-input" :value="currentDocName" type="text">
+                    <input class="window-input" :value="currentDocName" type="text" name="name">
                 </div>
 
                 <div class="settings-wrapper" id="test">
                     <span>Width (px):</span>
-                    <input class="window-input" :value="currentDocWidth" type="number">
+                    <input class="window-input" :value="currentDocWidth" type="number" name="doc-width" @input="inputValidation()">
                 </div>
 
                 <div class="settings-wrapper">
                     <span>Height (px):</span>
-                    <input class="window-input" :value="currentDocHeight" type="number">
+                    <input class="window-input" :value="currentDocHeight" type="number" name="doc-height" @input="inputValidation()">
                 </div>
 
                 <div class="settings-wrapper">
-                    <input type="checkbox" :checked="currentDocTransparent && 'checked'">
+                    <input type="checkbox" :checked="currentDocTransparent && 'checked'" name="transparency">
                     <span>Transparency</span>
                 </div>
             </form>
 
-            <div id="tiled-settings" v-if="docType == 1">
+            <div id="tiled-settings" v-if="docType == 1" ref="form">
 
             </div>
         </div>
         <div class="window-buttons">
-            <button class="window-button">OK</button>
+            <button class="window-button" @click="docType == 0 ? confirmSingleImage() : confirmTiledImage()">OK</button>
             <button class="window-button">Cancel</button>
         </div>
         <div class="window-footer"></div>
@@ -62,7 +62,8 @@ export default {
         currentDocType(){ return this.$store.getters.currentDocument.type },
         currentDocWidth(){ return this.$store.getters.currentDocument.width },
         currentDocHeight(){ return this.$store.getters.currentDocument.height },
-        currentDocTransparent(){ return this.$store.getters.currentDocument.transparent }
+        currentDocTransparent(){ return this.$store.getters.currentDocument.transparency },
+        currentDocument(){ return this.$store.getters.currentDocument }
     },
 
     data(){
@@ -73,7 +74,33 @@ export default {
     },
 
     methods: {
-          
+        inputValidation(){
+            var docWidth = this.$refs.form["doc-width"].value
+            this.$refs.form["doc-width"].value = docWidth > 1000 ? 1000 : docWidth
+
+            var docHeight = this.$refs.form["doc-height"].value
+            this.$refs.form["doc-height"].value = docHeight > 1000 ? 1000 : docHeight
+        },
+
+        confirmSingleImage(){
+            var name = this.$refs.form['name'].value
+            var docWidth = parseInt(this.$refs.form['doc-width'].value)
+            var docHeight = parseInt(this.$refs.form['doc-height'].value)
+            var transparency = this.$refs.form['transparency'].checked
+
+            this.currentDocument.type = 'single-image'
+            this.currentDocument.name = name
+            this.currentDocument.width = docWidth
+            this.currentDocument.height = docHeight
+            this.currentDocument.transparency = transparency
+
+            EventBus.$emit('new-document')
+            this.isOpen = false
+        },
+
+        confirmTiledImage(){
+
+        }
     }
 }
 </script>

@@ -4,27 +4,14 @@
 
 <script>
 import EventBus from '../EventBus'
+import baseTool from '../../mixins/baseTool'
 
 export default {
-    name: 'HandTool',
+    mixins: [baseTool],
 
     computed:{
         canvasPos(){ return this.$store.state.canvasPos },
         zoom(){ return this.$store.state.zoom }
-    },
-
-    mounted(){
-        EventBus.$on('hand-tool-mouseleft', () => {
-            this.mouseDownActions()
-        })
-
-        EventBus.$on('hand-tool-mousedrag', () => {
-            this.mouseDragActions()
-        })
-
-        EventBus.$on('hand-tool-exit', () => {
-            this.onExit()
-        })
     },
 
     data(){
@@ -34,25 +21,27 @@ export default {
     },
 
     methods: {
-        mouseDownActions(){
+        onMouseLeft(){
             var offsetX = event.clientX - this.canvasPos.x
             var offsetY = event.clientY - this.canvasPos.y
             this.mouseOffset = { x: offsetX, y: offsetY }
         },
 
-        mouseDragActions(){
+        onMouseDrag(){
             this.canvasPos.x = event.clientX - this.mouseOffset.x
             this.canvasPos.y = event.clientY - this.mouseOffset.y
 
             var hiddenX = Math.min(0, this.canvasPos.x) / this.zoom
             var hiddenY = Math.min(0, this.canvasPos.y) / this.zoom
-            this.$store.state.hiddenSize = [hiddenX, hiddenY]
+            this.$store.state.clippedSize = [hiddenX, hiddenY]
             EventBus.$emit('intersect-canvas')
+            EventBus.$emit('render-canvas')
         },
 
         onExit(){
             EventBus.$emit('correct-canvas-position')
             EventBus.$emit('intersect-canvas')
+            EventBus.$emit('render-canvas')
         }
     }
 }

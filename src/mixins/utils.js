@@ -4,6 +4,21 @@ export default {
             return Math.max(a, Math.min(b, x));
         },
 
+        pointInRect(x, y, rect){
+            //rect should be an object with x, y, w, h
+            return (x.isBetween(rect.x, rect.x + rect.w) &&
+                    y.isBetween(rect.y, rect.y + rect.h))
+        },
+
+        intersectRects(rect1, rect2){
+            var x = Math.max(rect1.x, rect2.x)
+            var y = Math.max(rect1.y, rect2.y)
+            var w = Math.min(rect1.x + rect1.w, rect2.w) - x
+            var h = Math.min(rect1.y + rect1.h, rect2.h) - y
+
+            return { x: x, y: y, w: w, h: h }
+        },
+
         rectToSquare(x1, y1, x2, y2){
             var dx = x2 - x1;   
             var dy = y2 - y1;

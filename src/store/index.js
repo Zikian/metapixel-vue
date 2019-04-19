@@ -5,8 +5,6 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    activeElement: null,
-
     currentTool: 'draw',
 
     color:{
@@ -24,23 +22,23 @@ export default new Vuex.Store({
       space: false,
       ctrl: false,
       shift: false,
-      alt: false
+      alt: false,
+      mouseDown: false,
     },
 
     selectedDocument: 0,
     documents:[
-      { name: 'Untitled', type: 'single-image', width: 100, height: 100, transparent: true }
+      { name: 'Untitled', type: 'single-image', width: 100, height: 100, transparency: true }
     ],
 
     selectedLayer: 0,
     layers:[],
 
     canvasPos: { x: 0, y: 0 },
-    hiddenSize: [0, 0],   //The amount by which the canvas is clipped by the canvas area on the top and left
+    clippedSize: [0, 0],   //The amount by which the canvas is clipped by the canvas area on the top and left
     ctx: null,
     
     mouseStart: [0, 0],   //Initial position of the mouse when drawing a rectangle/ellipse/selection
-    showDrawRectInfo: false,
 
     mousePos: [0, 0],
     prevPixelPos: [0, 0],
@@ -57,6 +55,25 @@ export default new Vuex.Store({
 
     elems: {
       canvasArea: null,
+      activeElement: null,
+    },
+
+    selection:{
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+
+      detached: false,
+      drawingSelection: false,
+      
+      //Bools relating to resizing the selection
+      clampX: false,
+      clampY: false,
+      resizeX: false,
+      resizeY: false,
+      flipX: false,
+      flipY: false
     }
 },
 

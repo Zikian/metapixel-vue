@@ -120,7 +120,7 @@ export default {
             this.mouseOffsetX = event.clientX - this.$refs.colorPickerHeader.getBoundingClientRect().x
             this.mouseOffsetY = event.clientY - this.$refs.colorPickerHeader.getBoundingClientRect().y
 
-            this.$store.state.activeElement = this.$refs.colorPickerHeader
+            this.$store.state.elems.activeElement = this.$refs.colorPickerHeader
         })
         this.$refs.colorPickerHeader.mousemoveActions = this.dragWindow
 

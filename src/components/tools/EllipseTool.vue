@@ -3,9 +3,10 @@
 <script>
 import EventBus from '../EventBus'
 import drawFunctions from '../../mixins/draw-functions'
+import baseTool from '../../mixins/baseTool'
 
 export default {
-    mixins: [drawFunctions],
+    mixins: [drawFunctions, baseTool],
 
     computed:{
         pixelPos(){ return this.$store.state.pixelPos },
@@ -17,33 +18,18 @@ export default {
         shiftKey(){ return this.$store.state.keys.shift }
     },
 
-    mounted(){
-        EventBus.$on('ellipse-tool-mouseleft', () => {
-            this.mouseLeftActions()
-        })
-
-        EventBus.$on('ellipse-tool-mousedrag', () => {
-            this.mouseDragActions()
-        })
-
-        EventBus.$on('ellipse-tool-mouseup', () => {
-            this.mouseUpActions()
-        })
-    },
-
     data(){
         return {
-            mouseEnd: []
+            mouseEnd: [],
         }
     },
 
     methods: {
-        mouseLeftActions(){
+        onMouseLeft(){
             this.mouseStart = this.pixelPos.slice()
-            this.$store.state.showDrawRectInfo = true
         },
     
-        mouseDragActions(){
+        onMouseDrag(){
             EventBus.$emit('render-background')
 
             if(this.shiftKey){
@@ -57,13 +43,12 @@ export default {
             EventBus.$emit('render-foreground')
         },
     
-        mouseUpActions(){
+        onMouseUp(){
             this.drawEllipse(this.primaryColor, ...this.mouseStart, ...this.mouseEnd)
-            this.$store.state.showDrawRectInfo = false
             EventBus.$emit('redraw-layers')
             EventBus.$emit('render-foreground')
             EventBus.$emit('render-preview')
-        },
+        }
     }
 }
 </script>

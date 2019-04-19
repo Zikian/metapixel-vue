@@ -1,31 +1,45 @@
 <template>
     <div id="toolbox">
-        <Tool id="draw-tool" :icon="drawIcon" :toolname="'draw'"/>
-        <DrawTool/>
-        <Tool id="eraser-tool" :icon="eraserIcon" :toolname="'eraser'"/>
-        <EraserTool/>
-        <Tool id="select-tool" :image="selectImage" :toolname="'select'"/>
-        <Tool id="fill-tool" :icon="fillIcon" :toolname="'fill'"/>
-        <FillTool/>
-        <Tool id="rectangle-tool" :icon="rectangleIcon" :toolname="'rectangle'"/>
-        <RectangleTool/>
-        <Tool id="ellipse-tool" :image="ellipseImage" :toolname="'ellipse'"/>
-        <EllipseTool/>
-        <Tool id="eyedropper-tool" :icon="eyedropperIcon" :toolname="'eyedropper'"/>
-        <EyedropperTool/>
-        <Tool id="hand-tool" :icon="handTool" :toolname="'hand'"/>
-        <HandTool/>
-        <Tool id="horizontal-mirror-tool" :image="mirrorTool" :toolname="'mirrorx'"/>
-        <Tool id="vertical-mirror-tool" :image="mirrorTool" :toolname="'mirrory'"/>
-        <MirrorTool/>
-        <Tool id="tile-placer-tool" :image="tilePlacerTool" :toolname="'tile-placer'"/>
-        <Tool id="tile-remover-tool" :image="tileRemoverTool" :toolname="'tile-remover'"/>
-        <Tool id="animation-tool" :image="animTool" :toolname="'animation'"/>
+        <ToolButton id="draw-tool" :icon="drawIcon" :toolname="'draw'"/>
+        <DrawTool ref="draw"/>
+
+        <ToolButton id="eraser-tool" :icon="eraserIcon" :toolname="'eraser'"/>
+        <EraserTool ref="eraser"/>
+
+        <ToolButton id="select-tool" :image="selectImage" :toolname="'select'"/>
+        <SelectTool ref="select"/>
+
+        <ToolButton id="fill-tool" :icon="fillIcon" :toolname="'fill'"/>
+        <FillTool ref="fill"/>
+
+        <ToolButton id="rectangle-tool" :icon="rectangleIcon" :toolname="'rectangle'"/>
+        <RectangleTool ref="rectangle"/>
+
+        <ToolButton id="ellipse-tool" :image="ellipseImage" :toolname="'ellipse'"/>
+        <EllipseTool ref="ellipse"/>
+
+        <ToolButton id="eyedropper-tool" :icon="eyedropperIcon" :toolname="'eyedropper'"/>
+        <EyedropperTool ref="eyedropper"/>
+
+        <ToolButton id="hand-tool" :icon="handTool" :toolname="'hand'"/>
+        <HandTool ref="hand"/>
+
+        <ToolButton id="horizontal-mirror-tool" :image="mirrorTool" :toolname="'mirrorx'"/>
+        <MirrorTool ref="mirrory"/>
+
+        <ToolButton id="vertical-mirror-tool" :image="mirrorTool" :toolname="'mirrory'"/>
+        <MirrorTool ref="mirrorx"/>
+
+        <ToolButton id="tile-placer-tool" :image="tilePlacerTool" :toolname="'tile-placer'"/>
+
+        <ToolButton id="tile-remover-tool" :image="tileRemoverTool" :toolname="'tile-remover'"/>
+        
+        <ToolButton id="animation-tool" :image="animTool" :toolname="'animation'"/>
     </div>
 </template>
 
 <script>
-import Tool from './Tool'
+import ToolButton from './ToolButton'
 import DrawTool from './tools/DrawTool'
 import EraserTool from './tools/EraserTool'
 import HandTool from './tools/HandTool'
@@ -34,6 +48,7 @@ import EllipseTool from './tools/EllipseTool'
 import FillTool from './tools/FillTool'
 import EyedropperTool from './tools/EyedropperTool'
 import MirrorTool from './tools/MirrorTool'
+import SelectTool from './tools/SelectTool'
 
 import EventBus from './EventBus'
 
@@ -44,7 +59,8 @@ export default {
         space(){ return this.$store.state.keys.space },
         alt(){ return this.$store.state.keys.alt },
         prevTool(){ return this.$store.state.prevTool },
-        currentTool(){ return this.$store.state.currentTool }
+        currentTool(){ return this.$store.state.currentTool },
+        mouseDown(){ return this.$store.state.keys.mouseDown },
     },
 
     watch:{
@@ -69,14 +85,40 @@ export default {
         EventBus.$on('switch-tools', newTool => {
             this.switchTools(newTool)
         })
+
+        EventBus.$on('current-tool-mouseleft', () => {
+            if (this.preventTool) return
+            this.$refs[this.currentTool].onMouseLeft()
+        })
+
+        EventBus.$on('current-tool-mousedrag', () => {
+            if (this.preventTool) return
+            this.$refs[this.currentTool].onMouseDrag()
+        })
+
+        EventBus.$on('current-tool-mouseup', () => {
+            if (this.preventTool) {
+                this.preventTool = false
+                return
+            }
+            this.$refs[this.currentTool].onMouseUp()
+        })
     },
 
     methods:{
         switchTools(newTool){
+            if(newTool === this.currentTool) { return }
+
             this.$store.state.prevTool = this.currentTool
-            EventBus.$emit(this.currentTool+"-tool-exit")
-            EventBus.$emit(newTool+"-tool-enter")
+            if(!this.preventTool && this.mouseDown){
+                this.$refs[this.currentTool].onMouseUp()
+            }
+            this.$refs[this.currentTool].onExit()
+
+            this.preventTool = this.mouseDown
+        
             this.$store.state.currentTool = newTool
+            this.$refs[newTool].onEnter()
         }
     },
 
@@ -93,12 +135,14 @@ export default {
             mirrorTool: require('../assets/mirror-tool.png'),
             tilePlacerTool: require('../assets/tile-placer.svg'),
             tileRemoverTool: require('../assets/tile-remover.svg'),
-            animTool: require('../assets/animbounds.svg')
+            animTool: require('../assets/animbounds.svg'),
+
+            preventTool: false
         }
     },
 
     components:{
-        Tool,
+        ToolButton,
         DrawTool,
         HandTool,
         EraserTool,
@@ -106,7 +150,8 @@ export default {
         EllipseTool,
         FillTool,
         EyedropperTool,
-        MirrorTool
+        MirrorTool,
+        SelectTool
     }
 }
 </script>

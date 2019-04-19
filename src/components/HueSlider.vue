@@ -15,13 +15,13 @@ export default {
     
     mounted(){
         this.$refs.hueSliderSelector.onmousedown = () => {
-            this.$store.state.activeElement = this.$refs.hueSliderSelector
+            this.$store.state.elems.activeElement = this.$refs.hueSliderSelector
         }
         this.$refs.hueSliderSelector.mousemoveActions = this.updateSlider
         
 
         this.$refs.hueSlider.addEventListener('mousedown', () => {
-            this.$store.state.activeElement = this.$refs.hueSliderSelector
+            this.$store.state.elems.activeElement = this.$refs.hueSliderSelector
             this.updateSlider()
         })
     },

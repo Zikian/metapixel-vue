@@ -1,8 +1,27 @@
 <template>
     <div id="canvas-area">
-        <canvas id="draw-canvas" :style="canvasStyle"></canvas>
-        <div id="mouse-pixel" :style="mousePixelStyle" v-if="displayMousePixel"></div>
+        <div 
+            id="selection-rect" 
+            :style="selectionStyle" 
+        >
+            <div
+                v-for="resizer in selectionResizers"
+                :key="resizer.key"
+                :id="resizer.id"
+                :data-resize-state="`[${resizer.resizeState.join()}]`"
+                class="selection-resizer"
+                :style="selectionResizerStyle" 
+            />
+        </div>
+
+        <canvas id="draw-canvas" :style="canvasStyle"/>
         <CanvasManager/>
+
+        <div 
+            id="mouse-pixel" 
+            :style="mousePixelStyle" 
+            v-if="displayMousePixel"
+        />
     </div>
 </template>
 
@@ -12,6 +31,38 @@ import CanvasManager from './managers/CanvasManager'
 export default {
     name: 'CanvasArea',
 
+    mounted(){
+        var selectionResizers = document.getElementsByClassName('selection-resizer')
+
+        for(var i = 0; i < 8; i++){
+            var componentInstance = this
+            selectionResizers[i].onmousedown = function() {
+                var resizeState = JSON.parse(this.getAttribute('data-resize-state'))
+
+                componentInstance.selection.clampX = resizeState[0]
+                componentInstance.selection.clampY = resizeState[1]
+                componentInstance.selection.resizeX = resizeState[2]
+                componentInstance.selection.resizeY = resizeState[3]
+            }
+        }
+    },
+
+    data(){
+        return{
+            //Resize state describes: clampX, clampY, resizeX, resizeY
+            selectionResizers:[
+                { key: 0, id: 'tl-resizer', resizeState: [false, false, true, true] },
+                { key: 1, id: 'tm-resizer', resizeState: [true, false, false, true] },
+                { key: 2, id: 'tr-resizer', resizeState: [true, false, true, true] },
+                { key: 3, id: 'lm-resizer', resizeState: [false, true, true, false] },
+                { key: 4, id: 'rm-resizer', resizeState: [true, true, true, false] },
+                { key: 5, id: 'bl-resizer', resizeState: [false, true, true, true] },
+                { key: 6, id: 'bm-resizer', resizeState: [true, true, false, true] },
+                { key: 7, id: 'br-resizer', resizeState: [true, true, true, true] },
+            ]
+        }
+    },
+
     computed:{
         pixelPos(){ return this.$store.state.pixelPos },
         canvasPos(){ return this.$store.state.canvasPos },
@@ -20,8 +71,17 @@ export default {
         brushSize(){ return this.$store.state.brushSize },
         pixelSize(){ return this.brushSize * this.zoom },
         currentTool(){ return this.$store.state.currentTool },
-        hiddenSize(){ return this.$store.state.hiddenSize },
+        clippedSize(){ return this.$store.state.clippedSize },
         primaryColor(){ return this.$store.state.color.primary },
+        selection:{ 
+            get(){ return this.$store.state.selection },
+            set(val){ this.$store.state.selection = val }
+        },
+
+        activeElement: {
+            get(){ return this.$store.state.elems.activeElement },
+            set(val){ this.$store.state.elems.activeElement = val }
+        },
 
         canvasStyle(){
             return { 
@@ -56,11 +116,32 @@ export default {
                              tool === 'fill')
 
             return mouseOverCanvas && validTool
+        },
+
+        selectionStyle(){
+            var selection = this.selection
+            var zoom = this.zoom
+            var canvasPos = this.canvasPos
+
+            return {
+                'left': selection.x * zoom + canvasPos.x + 'px',
+                'top': selection.y * zoom + canvasPos.y + 'px',
+                'width': selection.w * zoom + 'px',
+                'height': selection.h * zoom + 'px',
+                'outline': `1px solid ${selection.detached ? 'black' : 'red'}`,
+                'display': selection.w && selection.h ? 'block' : 'none'
+            }
+        },
+
+        selectionResizerStyle(){
+            return {
+                display: this.selection.detached ? 'block': 'none'
+            }
         }
     },
 
     components:{
-        CanvasManager
+        CanvasManager,
     }
 }
 </script>
@@ -85,5 +166,67 @@ export default {
     background-color:black;
     pointer-events: none;
 }
+
+#selection-rect{
+    position: absolute;
+    z-index: 1000;
+    outline: 1px solid red;
+    width: 10px;
+    height: 10px;
+}
+
+/* RESIZERS */
+.selection-resizer{
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    outline: 3px solid lightgray;
+    background-color: rgba(0, 0, 0, 0.603);
+}
+
+.selection-resizer:hover{
+    outline: 3px solid rgb(36, 36, 36);
+}
+
+#tl-resizer{
+    top: -5px;
+    left: -5px;
+}
+
+#tm-resizer{
+    top: -5px;
+    left: 49%
+}
+
+#tr-resizer{
+    top: -5px;
+    right: -5px;
+}
+
+#lm-resizer{
+    top: 49%;
+    left: -5px;
+}
+
+#rm-resizer{
+    top: 49%;
+    right: -5px;
+}
+
+#bl-resizer{
+    bottom: -5px;
+    left: -5px;
+}
+
+#bm-resizer{
+    bottom: -5px;
+    left: 49%;
+}
+
+#br-resizer{
+    bottom: -5px;
+    right: -5px;
+}
+
 </style>
 

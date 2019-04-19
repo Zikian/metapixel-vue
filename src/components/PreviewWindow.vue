@@ -76,16 +76,20 @@ export default {
         this.ctx = this.canvas.getContext('2d')
         
         this.canvas.clear = () => { this.ctx.clearRect(0, 0, this.docSize.width, this.docSize.height) }
-        this.canvas.width = this.docSize.width
-        this.canvas.height = this.docSize.height
-        this.ctx.scale(this.previewZoom, this.previewZoom)
 
-        this.setUpEvents()
+        this.initCanvas()
         //this.centerPreviewCanvas()
         this.updateVisibleRect()
+        this.setUpEvents()
     },
 
     methods:{
+        initCanvas(){
+            this.canvas.width = this.docSize.width
+            this.canvas.height = this.docSize.height
+            this.ctx.scale(this.previewZoom, this.previewZoom)
+        },
+
         zoomCanvas(direction){
             var zoomIndex = this.zoomStages.indexOf(this.previewZoom) + (direction === 'in' ? 1 : -1)
             if(!zoomIndex.isBetween(0, this.zoomStages.length)){ return }
@@ -118,9 +122,17 @@ export default {
                 this.updateVisibleRect()
             })
 
+            EventBus.$on('clear-drawing', () => {
+                this.canvas.clear() 
+            })
+
+            EventBus.$on('new-document', () => {
+                this.initCanvas()
+            })
+
             this.$refs.resizer.onmousedown = () => {
                 this.mouseOffset = event.clientY - this.$refs.resizer.offsetTop
-                this.$store.state.activeElement = this.$refs.resizer
+                this.$store.state.elems.activeElement = this.$refs.resizer
             }
 
             this.$refs.resizer.mousemoveActions = () => {

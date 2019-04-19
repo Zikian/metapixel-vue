@@ -19,7 +19,6 @@ export default {
         currentTool(){ return this.$store.state.currentTool },
 
         docSize(){ return this.$store.getters.docSize },
-
         canvasWidth(){ return this.docSize.width * this.zoom },
         canvasHeight(){ return this.docSize.height * this.zoom },
 
@@ -30,13 +29,17 @@ export default {
             get(){ return this.$store.state.canvasPos} ,
             set(val){ this.$store.state.canvasPos = val }
         },
-        hiddenSize(){ return this.$store.state.hiddenSize } ,
+        clippedSize(){ return this.$store.state.clippedSize } ,
 
         brushSize(){ return this.$store.state.brushSize },
         pixelSize(){ return this.brushSize * this.zoom },
 
         minSidebarRightWidth(){ return this.$store.state.constants.minSidebarRightWidth },
-        canvasAreaPos(){ return this.$store.state.constants.canvasAreaPos }
+        canvasAreaPos(){ return this.$store.state.constants.canvasAreaPos },
+
+        // activeElement:{
+        //     get(){ return this.$store.state.activeElement }
+        // }
     },
 
     data(){
@@ -58,18 +61,14 @@ export default {
 
     mounted(){
         this.$store.state.elems.canvasArea = document.querySelector('#canvas-area')
+
         this.maxCanvasWidth = document.body.offsetWidth - this.minSidebarRightWidth - this.canvasAreaPos.x,
         this.maxCanvasHeigth = document.body.offsetHeight - this.canvasAreaPos.y
-
-        this.calculateInitialZoom()
 
         //Set up the draw canvas
         this.canvas = document.querySelector('#draw-canvas')
         this.$store.state.ctx = this.canvas.getContext('2d')
         this.canvas.clear = () => { this.ctx.clearRect(0, 0, this.docSize.width, this.docSize.height); }
-        this.canvas.width = this.canvasWidth
-        this.canvas.height = this.canvasHeight
-        this.ctx.scale(this.zoom, this.zoom)
 
         //Set up the foreground canvas
         this.fgCanvas.clear = function(){ this.width = this.width }
@@ -78,12 +77,9 @@ export default {
         //Set up the background canvas
         this.bgCanvas.clear = function(){ this.width = this.width }
         this.bgCtx = this.bgCanvas.getContext('2d')
-        
-        //Position the canvas in the middle of the canvas area
-        var canvasX = (this.canvasArea.offsetWidth - this.canvasWidth) / 2
-        var canvasY = (this.canvasArea.offsetHeight - this.canvasHeight) / 2
-        this.canvasPos = { x: canvasX, y: canvasY }
 
+        this.calculateInitialZoom()
+        this.initCanvas()
         this.setUpEvents()
     },
 
@@ -105,20 +101,48 @@ export default {
 
             this.correctCanvasPosition()
             this.intersectCanvas()
+            this.render()
         },
 
         intersectCanvas(){
             // Get intersection between max-canvas-size rect and canvas rect
-            var x = Math.max(this.canvasPos.x, 0);
-            var y = Math.max(this.canvasPos.y, 0);
-            var w = Math.min(this.canvasPos.x + this.canvasWidth, this.maxCanvasWidth) - x;
-            var h = Math.min(this.canvasPos.y + this.canvasHeight, this.maxCanvasHeigth) - y;
+            var canvasRect = { 
+                x: this.canvasPos.x,
+                y: this.canvasPos.y,
+                w: this.canvasWidth,
+                h: this.canvasHeight
+            }
 
-            this.canvas.width = w > 0 ? w : 0
-            this.canvas.height = h > 0 ? h : 0
+            var maxSizeRect = {
+                x: 0,
+                y: 0,
+                w: this.maxCanvasWidth,
+                h: this.maxCanvasHeigth
+            }
+            
+            var intersection = this.intersectRects(canvasRect, maxSizeRect)
 
-            this.scaleContext()
-            this.render()
+            this.canvas.width = intersection.w > 0 ? intersection.w : 0
+            this.canvas.height = intersection.h > 0 ? intersection.h : 0
+            this.ctx.scale(this.zoom, this.zoom)
+        },
+
+        initCanvas(){
+            //Change canvas sizes
+            this.canvas.width = this.canvasWidth
+            this.canvas.height = this.canvasHeight
+            this.ctx.scale(this.zoom, this.zoom)
+
+            this.fgCanvas.width = this.docSize.width
+            this.fgCanvas.height = this.docSize.height
+            
+            this.bgCanvas.width = this.docSize.width
+            this.bgCanvas.height = this.docSize.height
+
+            //Position the canvas in the middle of the canvas area
+            var canvasX = (this.canvasArea.offsetWidth - this.canvasWidth) / 2
+            var canvasY = (this.canvasArea.offsetHeight - this.canvasHeight) / 2
+            this.canvasPos = { x: canvasX, y: canvasY }
         },
 
         correctCanvasPosition(){
@@ -133,29 +157,25 @@ export default {
                 this.canvasPos.y = hiddenY * this.zoom
             }
 
-            this.$store.state.hiddenSize = [hiddenX, hiddenY]
-        },
-
-        scaleContext(){
-            this.ctx.scale(this.zoom, this.zoom)
+            this.$store.state.clippedSize = [hiddenX, hiddenY]
         },
 
         render(){
             this.canvas.clear()
             this.ctx.imageSmoothingEnabled = false
-            this.ctx.drawImage(this.bgCanvas, ...this.hiddenSize)
-            this.ctx.drawImage(this.fgCanvas, ...this.hiddenSize)
+            this.ctx.drawImage(this.bgCanvas, ...this.clippedSize)
+            this.ctx.drawImage(this.fgCanvas, ...this.clippedSize)
         },
 
         renderForeground(){
             this.ctx.imageSmoothingEnabled = false
-            this.ctx.drawImage(this.fgCanvas, ...this.hiddenSize)
+            this.ctx.drawImage(this.fgCanvas, ...this.clippedSize)
         },
 
         renderBackground(){
             this.canvas.clear()
             this.ctx.imageSmoothingEnabled = false;
-            this.ctx.drawImage(this.bgCanvas, ...this.hiddenSize);
+            this.ctx.drawImage(this.bgCanvas, ...this.clippedSize);
         },
 
         redrawBackground(){
@@ -185,8 +205,8 @@ export default {
                 var invalidTool = this.currentTool === 'eyedropper'
 
                 if(!invalidTool){
-                    EventBus.$emit(this.currentTool+'-tool-mouseleft')
-                    this.$store.state.activeElement = this.canvas
+                    EventBus.$emit('current-tool-mouseleft')
+                    this.$store.state.elems.activeElement = this.canvas
                 }
             }
 
@@ -199,17 +219,19 @@ export default {
             })
 
             this.canvas.onmousedown = () => { 
+                this.$store.state.keys.mouseDown = true //Window eventlistener will not register mousedown because stopPropagation
                 event.stopPropagation()
-                EventBus.$emit(this.currentTool+'-tool-mouseleft')
-                this.$store.state.activeElement = this.canvas
+                
+                EventBus.$emit('current-tool-mouseleft')
+                this.$store.state.elems.activeElement = this.canvas
             }
 
             this.canvas.mousemoveActions = () => {
-                EventBus.$emit(this.currentTool+'-tool-mousedrag')
+                EventBus.$emit('current-tool-mousedrag')
             }
 
             this.canvas.mouseupActions = () => {
-                EventBus.$emit(this.currentTool+'-tool-mouseup')
+                EventBus.$emit('current-tool-mouseup')
             }
 
             EventBus.$on('render-canvas', () => {
@@ -240,16 +262,26 @@ export default {
             EventBus.$on('correct-canvas-position', () => {
                 this.correctCanvasPosition()
             })
+
+            EventBus.$on('clear-drawing', () => {
+                this.canvas.clear()
+                this.fgCanvas.clear()
+                this.bgCanvas.clear()
+            })
+
+            EventBus.$on('new-document', () => {
+                this.calculateInitialZoom()
+                this.initCanvas()
+            })
         },
 
         calculateInitialZoom(){
             var zoom = Math.floor(Math.min(this.canvasArea.offsetWidth / this.docSize.width, 
                                        this.canvasArea.offsetHeight / this.docSize.height))
-
             //Get zoom stage closest to the calculated zoom
             this.zoom = this.zoomStages.reduce(function(prev, curr) {
                 return Math.abs(curr - zoom) < Math.abs(prev - zoom) ? curr : prev;
-            });
+            })
         }
     }
 }

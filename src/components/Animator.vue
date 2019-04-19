@@ -40,7 +40,7 @@ export default {
     mounted(){
         this.$refs.resizer.onmousedown = () => {
             this.mouseOffset = this.$refs.animatorBody.offsetTop - event.clientY
-            this.$store.state.activeElement = this.$refs.resizer
+            this.$store.state.elems.activeElement = this.$refs.resizer
         }
 
         this.$refs.resizer.mousemoveActions = () => {

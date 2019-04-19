@@ -40,14 +40,14 @@ new Vue({
   store,
 
   computed:{
-    activeElement(){ return this.$store.state.activeElement },
+    activeElement(){ return this.$store.state.elems.activeElement },
 
     zoom(){ return this.$store.state.zoom },
     brushSize(){ return this.$store.state.brushSize },
 
     canvasPos(){ return this.$store.state.canvasPos },
     pixelPos(){ return this.$store.state.pixelPos },
-    hiddenSize(){ return this.$store.state.hiddenSize },
+    clippedSize(){ return this.$store.state.clippedSize },
 
     currentTool(){ return this.$store.state.currentTool },
     keys(){ return this.$store.state.keys },
@@ -70,20 +70,26 @@ new Vue({
     })
 
     window.addEventListener('mousedown', () => {
+      this.$store.state.keys.mouseDown = true
+
       if(this.activeElement && this.activeElement.hasOwnProperty('mousedownActions')){
         this.activeElement.mousedownActions()
       }
     })
 
     window.addEventListener('mouseup', () => {
+      this.$store.state.keys.mouseDown = false
+
       if(this.activeElement && this.activeElement.hasOwnProperty('mouseupActions')){
         this.activeElement.mouseupActions()
       }
 
-      this.$store.state.activeElement = null
+      this.$store.state.elems.activeElement = null
     })
 
     window.addEventListener('keydown', () => {
+      if (document.activeElement.tagName == 'INPUT') return
+      
       switch(event.keyCode){
         case 67: //C key
           if(!this.keys.ctrl){
@@ -123,10 +129,18 @@ new Vue({
         case 18: //Alt key
           this.$store.state.keys.alt = true
           break
+        case 8: //Backspace key
+          if(this.currentTool === 'select'){
+            EventBus.$emit('clear-selection-contents')
+            EventBus.$emit('redraw-background')
+            EventBus.$emit('render-canvas')
+          }
       }
     })
 
     window.addEventListener('keyup', () => {
+      if (document.activeElement.tagName == 'INPUT') return
+
       switch(event.keyCode){
         case 32: //Space key
           this.$store.state.keys.space = false

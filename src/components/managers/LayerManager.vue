@@ -5,13 +5,20 @@ import EventBus from '../EventBus'
 
 export default {
     computed:{
-        layers(){ return this.$store.state.layers },
         docSize(){ return this.$store.getters.docSize },
+        selection(){ return this.$store.state.selection },
 
         selectedLayer:{ 
             get(){ return this.$store.state.selectedLayer },
             set(id){ this.$store.state.selectedLayer = id }
-        }
+        },
+
+        layers:{ 
+            get(){ return this.$store.state.layers },
+            set(val){ this.$store.state.layers = val }
+        },
+
+        currentLayer(){ return this.layers[this.selectedLayer] }
     },
 
     mounted(){
@@ -41,6 +48,20 @@ export default {
 
         EventBus.$on('merge-layer-down', id => {
             this.mergeLayerDown(id)
+        })
+
+        EventBus.$on('clear-drawing', () => {
+            this.layers = []
+            this.addLayer(0, 'Layer 0')
+        })
+
+        EventBus.$on('new-document', () => {
+            this.layers = []
+            this.addLayer(0, 'Layer 0')
+        })
+
+        EventBus.$on('clear-selection-contents', () => {
+            this.clearSelectionContents()
         })
 
         this.addLayer(0, 'Layer 0')
@@ -110,6 +131,10 @@ export default {
             this.layers.splice(id, 1)
             this.updateLayerIndices()
             this.selectLayer(id)
+        },
+
+        clearSelectionContents(){
+            this.currentLayer.ctx.clearRect(this.selection.x, this.selection.y, this.selection.w, this.selection.h)
         }
     }
 }

@@ -5,9 +5,10 @@
 <script>
 import EventBus from '../EventBus'
 import drawFunctions from '../../mixins/draw-functions'
+import baseTool from '../../mixins/baseTool'
 
 export default {
-    mixins: [drawFunctions],
+    mixins: [drawFunctions, baseTool],
 
     computed:{
         primaryColor(){ return this.$store.state.color.primary },
@@ -31,42 +32,8 @@ export default {
         }
     },
 
-    mounted(){
-        EventBus.$on('mirrorx-tool-mouseleft', () => {
-            this.mouseLeftActions()
-        })
-
-        EventBus.$on('mirrorx-tool-mousedrag', () => {
-            this.mouseDragActions()
-        })
-
-        EventBus.$on('mirrorx-tool-mouseup', () => {
-            this.mouseUpActions()
-        })
-
-        EventBus.$on('mirrorx-tool-exit', () => {
-            this.onExit()   
-        })
-
-        EventBus.$on('mirrory-tool-mouseleft', () => {
-            this.mouseLeftActions()
-        })
-
-        EventBus.$on('mirrory-tool-mousedrag', () => {
-            this.mouseDragActions()
-        })
-
-        EventBus.$on('mirrory-tool-mouseup', () => {
-            this.mouseUpActions()
-        })
-
-        EventBus.$on('mirrory-tool-exit', () => {
-            this.onExit()   
-        })
-    },
-
     methods: {
-        mouseLeftActions(){
+        onMouseLeft(){
             this.isDrawingLine = this.shiftKey
             this.mouseStart = this.pixelPos.slice()
             this.mouseEnd = this.pixelPos.slice()
@@ -78,7 +45,7 @@ export default {
             EventBus.$emit('render-foreground')
         },
     
-        mouseDragActions(){
+        onMouseDrag(){
             if(this.isDrawingLine){
                 EventBus.$emit('render-background')
                 
@@ -97,7 +64,7 @@ export default {
             EventBus.$emit('render-foreground')
         },
     
-        mouseUpActions(){
+        onMouseUp(){
             if(this.isDrawingLine){
                 this.drawLine(...this.mouseStart, ...this.mouseEnd, this.primaryColor)
                 this.drawLine(...this.mirror(this.mouseStart), ...this.mirror(this.mouseEnd), this.primaryColor)
@@ -109,10 +76,6 @@ export default {
 
             EventBus.$emit('redraw-background')
             EventBus.$emit('render-preview')
-        },
-
-        onExit(){
-            this.drawBuffer = []
         },
 
         mirror(pos){

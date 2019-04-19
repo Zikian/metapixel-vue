@@ -76,7 +76,7 @@ export default {
     methods:{
         showSlider(){
             this.sliderActive = true
-            this.$store.state.activeElement = this.selector
+            this.$store.state.elems.activeElement = this.selector
 
             var mouseOffset = event.clientY - this.wrapper.getBoundingClientRect().y;
 
