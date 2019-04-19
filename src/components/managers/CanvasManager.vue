@@ -218,6 +218,21 @@ export default {
             this.pasteCtx.drawImage(this.copyCanvas, 0, 0, this.selection.w, this.selection.h);
         },
 
+        flipPasteCanvas(){
+            if(!this.selectionExists) { return; }
+
+            var selection = this.selection
+
+            this.pasteCanvas.width = selection.w;
+            this.pasteCanvas.height = selection.h;
+
+            this.pasteCtx.translate(selection.flipX * selection.w, selection.flipY * selection.h)
+            this.pasteCtx.scale(selection.flipX? -1 : 1, selection.flipY? -1 : 1);
+            
+            this.pasteCtx.imageSmoothingEnabled = false;
+            this.pasteCtx.drawImage(this.copyCanvas, 0, 0, selection.w, selection.h);
+        },
+
         detachSelection(){
             this.copyCanvas.width = this.selection.w;
             this.copyCanvas.height = this.selection.h;
@@ -339,6 +354,10 @@ export default {
 
             EventBus.$on('paste-selection', () => {
                 this.pasteSelection()
+            })
+
+            EventBus.$on('flip-paste-canvas', () => {
+                this.flipPasteCanvas()
             })
         },
 

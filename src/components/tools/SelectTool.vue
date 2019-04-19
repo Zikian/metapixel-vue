@@ -178,6 +178,10 @@ export default {
                     selection.h = newH;
                 }
             }
+
+            EventBus.$emit('flip-paste-canvas')
+            EventBus.$emit('render-canvas')
+            EventBus.$emit('render-preview')
         },
 
         detachSelection(){
@@ -189,8 +193,8 @@ export default {
 
         commitSelection(){
             this.selection.detached = false
-            this.flipX = false
-            this.flipY = false
+            this.selection.flipX = false
+            this.selection.flipY = false
             EventBus.$emit('commit-selection')
 
             this.intersectSelection()
