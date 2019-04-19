@@ -2,44 +2,43 @@
 
 <script>
 import EventBus from '../EventBus'
+import drawFunctions from '../../mixins/draw-functions'
 
 export default {
     name: 'CanvasManager',
 
+    mixins:[drawFunctions],
+
     computed:{
         layers(){ return this.$store.state.layers },
         selectedLayer(){ return this.$store.state.selectedLayer },
-        
         ctx(){ return this.$store.state.ctx },
-
-        zoom:{ 
-            get(){ return this.$store.state.zoom },
-            set(val){ this.$store.state.zoom = val }
-        },
         currentTool(){ return this.$store.state.currentTool },
-
         docSize(){ return this.$store.getters.docSize },
         canvasWidth(){ return this.docSize.width * this.zoom },
         canvasHeight(){ return this.docSize.height * this.zoom },
-
         canvasArea(){ return this.$store.state.elems.canvasArea },
-
         pixelPos(){ return this.$store.state.pixelPos },
+        clippedSize(){ return this.$store.state.clippedSize } ,
+        brushSize(){ return this.$store.state.brushSize },
+        pixelSize(){ return this.brushSize * this.zoom },
+        minSidebarRightWidth(){ return this.$store.state.constants.minSidebarRightWidth },
+        canvasAreaPos(){ return this.$store.state.constants.canvasAreaPos },
+        currentLayer(){ return this.$store.getters.currentLayer },
+        selectionExists(){ return this.selection.w && this.selection.h },
+
+        pasteCanvas:{
+            get(){ return this.$store.state.elems.pasteCanvas },
+            set(val){ this.$store.state.elems.pasteCanvas = val }
+        },
         canvasPos:{ 
             get(){ return this.$store.state.canvasPos} ,
             set(val){ this.$store.state.canvasPos = val }
         },
-        clippedSize(){ return this.$store.state.clippedSize } ,
-
-        brushSize(){ return this.$store.state.brushSize },
-        pixelSize(){ return this.brushSize * this.zoom },
-
-        minSidebarRightWidth(){ return this.$store.state.constants.minSidebarRightWidth },
-        canvasAreaPos(){ return this.$store.state.constants.canvasAreaPos },
-
-        // activeElement:{
-        //     get(){ return this.$store.state.activeElement }
-        // }
+        zoom:{ 
+            get(){ return this.$store.state.zoom },
+            set(val){ this.$store.state.zoom = val }
+        },
     },
 
     data(){
@@ -54,6 +53,11 @@ export default {
             bgCanvas: document.createElement('canvas'),
             bgCtx: null,
 
+            copyCanvas: document.createElement('canvas'),
+            copyCtx: null,
+
+            pasteCtx: null,
+
             maxCanvasWidth: null,
             maxCanvasHeigth: null
         }
@@ -65,18 +69,23 @@ export default {
         this.maxCanvasWidth = document.body.offsetWidth - this.minSidebarRightWidth - this.canvasAreaPos.x,
         this.maxCanvasHeigth = document.body.offsetHeight - this.canvasAreaPos.y
 
-        //Set up the draw canvas
+        //Set up the canvases
         this.canvas = document.querySelector('#draw-canvas')
         this.$store.state.ctx = this.canvas.getContext('2d')
         this.canvas.clear = () => { this.ctx.clearRect(0, 0, this.docSize.width, this.docSize.height); }
 
-        //Set up the foreground canvas
         this.fgCanvas.clear = function(){ this.width = this.width }
         this.fgCtx = this.fgCanvas.getContext('2d')
 
-        //Set up the background canvas
         this.bgCanvas.clear = function(){ this.width = this.width }
         this.bgCtx = this.bgCanvas.getContext('2d')
+
+        this.copyCanvas.clear = function(){ this.width = this.width }
+        this.copyCtx = this.copyCanvas.getContext('2d')
+
+        this.pasteCanvas = document.createElement('canvas'),
+        this.pasteCanvas.clear = function(){ this.width = this.width }
+        this.pasteCtx = this.pasteCanvas.getContext('2d')
 
         this.calculateInitialZoom()
         this.initCanvas()
@@ -164,6 +173,7 @@ export default {
             this.canvas.clear()
             this.ctx.imageSmoothingEnabled = false
             this.ctx.drawImage(this.bgCanvas, ...this.clippedSize)
+            this.ctx.drawImage(this.pasteCanvas, this.selection.x + this.clippedSize[0], this.selection.y + this.clippedSize[1]);
             this.ctx.drawImage(this.fgCanvas, ...this.clippedSize)
         },
 
@@ -198,6 +208,51 @@ export default {
                     this.fgCtx.drawImage(layer.canvas, 0, 0)
                 }
             })
+        },
+
+        drawPasteCanvas(){
+            if(!this.selectionExists) { return; }
+            this.pasteCanvas.width = this.selection.w;      
+            this.pasteCanvas.height = this.selection.h;
+            this.pasteCtx.imageSmoothingEnabled = false;
+            this.pasteCtx.drawImage(this.copyCanvas, 0, 0, this.selection.w, this.selection.h);
+        },
+
+        detachSelection(){
+            this.copyCanvas.width = this.selection.w;
+            this.copyCanvas.height = this.selection.h;
+
+            var sourceRect = [this.selection.x, this.selection.y, this.selection.w, this.selection.h]
+            var targetRect = [0, 0, this.selection.w, this.selection.h]
+            this.copyCtx.drawImage(this.currentLayer.canvas, ...sourceRect, ...targetRect);
+
+            this.drawPasteCanvas();
+            this.clearSelectionContents()
+
+            this.render()
+        },
+
+        commitSelection(){
+            this.pasteSelection();
+            this.copyCanvas.clear()
+            this.pasteCanvas.clear()
+        },
+
+        pasteSelection(){
+            this.currentLayer.ctx.drawImage(this.pasteCanvas, this.selection.x, this.selection.y);
+
+            this.redrawBackground();
+            this.render();
+            EventBus.$emit('render-preview')
+        },
+
+        clearSelectionContents(){
+            this.erasePixel(this.selection.x, this.selection.y, this.selection.w, this.selection.h)
+
+            this.redrawBackground()
+            this.redrawForeground()
+            this.render()
+            EventBus.$emit('render-preview')
         },
 
         setUpEvents(){
@@ -272,6 +327,18 @@ export default {
             EventBus.$on('new-document', () => {
                 this.calculateInitialZoom()
                 this.initCanvas()
+            })
+
+            EventBus.$on('detach-selection', () => {
+                this.detachSelection()
+            })
+
+            EventBus.$on('commit-selection', () => {
+                this.commitSelection()
+            })
+
+            EventBus.$on('paste-selection', () => {
+                this.pasteSelection()
             })
         },
 

@@ -56,6 +56,7 @@ export default new Vuex.Store({
     elems: {
       canvasArea: null,
       activeElement: null,
+      pasteCanvas: null
     },
 
     selection:{

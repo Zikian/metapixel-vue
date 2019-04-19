@@ -29,6 +29,9 @@ export default {
         canvasArea(){ return this.$store.state.elems.canvasArea },
         canvasPos(){ return this.$store.state.canvasPos },
         layers(){ return this.$store.state.layers },
+        currentLayer(){ return this.$store.getters.currentLayer },
+        selection(){ return this.$store.state.selection },
+        pasteCanvas(){ return this.$store.state.elems.pasteCanvas },
 
         visibleRectStyle(){
             return {
@@ -109,6 +112,10 @@ export default {
                 if(layer.visible){
                     this.ctx.globalAlpha = layer.opacity;
                     this.ctx.drawImage(layer.canvas, 0, 0);
+                }
+
+                if(layer == this.currentLayer){
+                    this.ctx.drawImage(this.pasteCanvas, this.selection.x * this.previewZoom, this.selection.y * this.previewZoom);
                 }
             })
         },

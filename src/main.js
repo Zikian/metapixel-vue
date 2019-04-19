@@ -160,7 +160,7 @@ new Vue({
 
   methods:{
     updatePixelPos(){
-      this.$store.state.prevPixelPos = this.pixelPos.slice()
+      this.$store.state.prevPixelPos = this.pixelPos
       var x = Math.round((event.clientX - this.canvasAreaPos.x - this.canvasPos.x) / this.zoom - this.brushSize / 2)
       var y = Math.round((event.clientY - this.canvasAreaPos.y - this.canvasPos.y) / this.zoom - this.brushSize / 2)
       this.$store.state.pixelPos = [x, y]

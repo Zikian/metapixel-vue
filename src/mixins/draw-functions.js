@@ -35,8 +35,8 @@ export default {
             this.ctx.fillRect(nX + this.clippedSize[0], nY + this.clippedSize[1], nW, nH)
         },
 
-        erasePixel(x, y){
-            this.currentLayer.ctx.clearRect(x, y, this.brushSize, this.brushSize)
+        erasePixel(x, y, w = this.brushSize, h = this.brushSize){
+            this.currentLayer.ctx.clearRect(x, y, w, h)
         },
         
         drawLine(x0, y0, x1, y1, color){
@@ -105,13 +105,21 @@ export default {
             }
         },
 
-        floodFill(x, y, newColor, oldColor){            
+        floodFill(x, y, newColor, oldColor){          
             var pixelStack = [[x, y]]
             
-            var selectionX = this.selection.x
-            var selectionY = this.selection.y
-            var selectionW = this.selection.w
-            var selectionH = this.selection.h
+            var selectionX, selectionY, selectionW, selectionH
+            if(this.selectionExists){
+                selectionX = this.selection.x
+                selectionY = this.selection.y
+                selectionW = this.selection.w
+                selectionH = this.selection.h
+            } else {
+                selectionX = 0
+                selectionY = 0
+                selectionW = this.docSize.width
+                selectionH = this.docSize.height
+            }
             
             var colorLayer = this.currentLayer.ctx.getImageData(0, 0, this.docSize.width, this.docSize.height);
 

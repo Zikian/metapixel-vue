@@ -2,6 +2,7 @@
 
 <script>
 import baseTool from '../../mixins/baseTool'
+import EventBus from '../EventBus'
 
 export default {
     mixins: [baseTool],
@@ -15,6 +16,7 @@ export default {
             set(val){ this.$store.state.mouseStart = val }
         },
         shiftKey(){ return this.$store.state.keys.shift },
+        altKey(){ return this.$store.state.keys.alt },
         selection:{ 
             get(){ return this.$store.state.selection },
             set(val){ this.$store.state.selection = val } 
@@ -28,11 +30,6 @@ export default {
         resizingSelection(){ 
             return (this.selection.resizeX || this.selection.resizeY)  
         },
-
-        drawingSelection:{
-            get(){ return this.$store.state.selection.drawingSelection },
-            set(val){ this.$store.state.selection.drawingSelection = val }
-        }
     },
 
     data(){
@@ -46,6 +43,10 @@ export default {
         onMouseLeft(){
             if(this.resizingSelection) return
 
+            if(this.selection.detached && this.altKey){
+                EventBus.$emit('paste-selection')
+            }
+
             if(this.selectionExists && this.mouseOverSelection){
                 if(this.shiftKey){
                     this.detachSelection()
@@ -58,10 +59,12 @@ export default {
             } else {
                 if(this.selection.detached){
                     this.commitSelection()
+                } else {
+                    this.clearSelection()
                 }
 
                 //Draw selection
-                this.drawingSelection = true
+                this.selection.drawingSelection = true
                 this.mouseStart = this.pixelPos
                 this.mouseEnd = this.mouseStart
             }
@@ -70,7 +73,7 @@ export default {
         onMouseDrag(){
             if(this.resizingSelection){
                 this.resizeSelection()
-            } else if(this.drawingSelection){
+            } else if(this.selection.drawingSelection){
                 this.drawSelection()
             } else {
                 this.moveSelection()
@@ -78,29 +81,23 @@ export default {
         },
     
         onMouseUp(){
-            if(this.resizingSelection){
-                this.selection.resizeX = false
-                this.selection.resizeY = false
-            }
-
-            if(this.mouseEnd.join() === this.mouseStart.join()){
-                if(this.selection.detached){
-                    this.commitSelection()
-                } else {
-                    this.clearSelection()
-                }
-            }
+            this.selection.resizeX = false
+            this.selection.resizeY = false
+            this.selection.drawingSelection = false
 
             if(!this.selection.detached){
                 this.intersectSelection()
             }
-
-            this.drawingSelection = false
         },
 
         moveSelection(){
             this.selection.x = this.pixelPos[0] - this.mouseOffset[0]
             this.selection.y = this.pixelPos[1] - this.mouseOffset[1]
+
+            if(this.selection.detached){
+                EventBus.$emit('render-canvas')
+                EventBus.$emit('render-preview')
+            }
         },
 
         drawSelection(){
@@ -110,7 +107,7 @@ export default {
                 this.mouseEnd = this.rectToSquare(...this.mouseStart, ...this.pixelPos)
                 selectionRect = this.getRect(this.mouseStart, this.mouseEnd)
             } else {
-                this.mouseEnd = this.pixelPos.slice()
+                this.mouseEnd = this.pixelPos
                 selectionRect = this.getRect(this.mouseStart, this.mouseEnd)
             }
 
@@ -141,7 +138,7 @@ export default {
         },
         
         clearSelection(){
-            this.selection = { x: 0, y: 0, w: 0, h: 0 }
+            Object.assign(this.selection, { x: 0, y: 0, w: 0, h: 0 })
         },
 
         resizeSelection(){
@@ -184,13 +181,19 @@ export default {
         },
 
         detachSelection(){
+            if(this.selection.detached) return
+
             this.selection.detached = true
+            EventBus.$emit('detach-selection')
         },
 
         commitSelection(){
             this.selection.detached = false
-            this.flipX = false,
-            this.flipX = true
+            this.flipX = false
+            this.flipY = false
+            EventBus.$emit('commit-selection')
+
+            this.intersectSelection()
         },
     }
 }

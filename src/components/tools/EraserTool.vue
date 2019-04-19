@@ -25,10 +25,12 @@ export default {
     methods: {
         onMouseLeft(){
             // this.isDrawingLine = this.shiftKey
-            // this.mouseStart = this.pixelPos.slice()
-            // this.mouseEnd = this.pixelPos.slice()
+            // this.mouseStart = this.pixelPos
+            // this.mouseEnd = this.pixelPos
 
+            this.drawBuffer = []
             this.drawBuffer.push(this.pixelPos)
+
             this.erasePixel(...this.pixelPos);
 
             EventBus.$emit('redraw-layers')
@@ -39,7 +41,7 @@ export default {
             if(this.isDrawingLine){
                 EventBus.$emit('render-background')
                 this.drawPreviewLine(...this.mouseStart, ...this.pixelPos)
-                this.mouseEnd = this.pixelPos.slice()
+                this.mouseEnd = this.pixelPos
                 EventBus.$emit('render-foreground')
             } else {
                 this.drawBuffer.push(this.pixelPos)
@@ -59,7 +61,6 @@ export default {
                 this.isDrawingLine = this.shiftKey
             }
 
-            this.drawBuffer = []
             EventBus.$emit('redraw-layers')
             EventBus.$emit('render-preview')
         },

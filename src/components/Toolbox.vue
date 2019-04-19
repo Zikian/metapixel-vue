@@ -73,6 +73,8 @@ export default {
         },
 
         alt(){
+            if(this.currentTool == 'select') return
+
             if(this.alt){
                 this.switchTools('eyedropper')
             } else if(this.currentTool === 'eyedropper') {

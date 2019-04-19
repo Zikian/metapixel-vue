@@ -26,7 +26,8 @@ export default {
 
     methods: {
         onMouseLeft(){
-            this.mouseStart = this.pixelPos.slice()
+            this.mouseStart = this.pixelPos
+            this.mouseEnd = this.pixelPos
         },
     
         onMouseDrag(){
@@ -36,7 +37,7 @@ export default {
                 this.mouseEnd = this.rectToSquare(...this.mouseStart, ...this.pixelPos)
                 this.drawPreviewEllipse(this.primaryColor, ...this.mouseStart, ...this.mouseEnd)
             } else {
-                this.mouseEnd = this.pixelPos.slice()
+                this.mouseEnd = this.pixelPos
                 this.drawPreviewEllipse(this.primaryColor, ...this.mouseStart, ...this.mouseEnd)
             }
 

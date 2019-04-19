@@ -61,14 +61,17 @@ export default {
     mousePos(){ return this.$store.state.mousePos },
     drawRectWidth(){ return Math.abs(this.mouseStart[0] - this.pixelPos[0]) + 1 },
     drawRectHeight(){ return Math.abs(this.mouseStart[1] - this.pixelPos[1]) + 1 },
-    drawingSelection(){ return this.$store.state.selection.drawingSelection },
+    selection(){ return this.$store.state.selection },
     mouseDown(){ return this.$store.state.keys.mouseDown },
 
     showDrawRectInfo(){ 
       var validTool = (this.currentTool === 'rectangle' ||
                        this.currentTool === 'ellipse')
 
-      return (this.mouseDown && validTool || this.drawingSelection)
+      return (this.mouseDown && validTool || 
+                (this.selection.drawingSelection &&
+                 this.drawRectWidth > 1 && 
+                 this.drawRectHeight > 1))
     },
   },
 

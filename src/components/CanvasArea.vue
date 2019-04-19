@@ -135,6 +135,7 @@ export default {
 
         selectionResizerStyle(){
             return {
+                
                 display: this.selection.detached ? 'block': 'none'
             }
         }
