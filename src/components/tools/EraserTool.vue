@@ -39,7 +39,6 @@ export default {
     
         onMouseDrag(){
             if(this.isDrawingLine){
-                EventBus.$emit('render-background')
                 this.drawPreviewLine(...this.mouseStart, ...this.pixelPos)
                 this.mouseEnd = this.pixelPos
                 EventBus.$emit('render-foreground')
@@ -49,7 +48,7 @@ export default {
                     this.drawLine(...this.drawBuffer[0], ...this.drawBuffer[1])
                     this.drawBuffer.shift()
                 }
-                EventBus.$emit('render-canvas')
+                EventBus.$emit('render-foreground')
             }
 
         },

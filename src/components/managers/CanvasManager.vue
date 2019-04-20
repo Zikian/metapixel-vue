@@ -218,7 +218,7 @@ export default {
             this.pasteCtx.drawImage(this.copyCanvas, 0, 0, this.selection.w, this.selection.h);
         },
 
-        flipPasteCanvas(){
+        resizePasteCanvas(){
             if(!this.selectionExists) { return; }
 
             var selection = this.selection
@@ -356,8 +356,12 @@ export default {
                 this.pasteSelection()
             })
 
-            EventBus.$on('flip-paste-canvas', () => {
-                this.flipPasteCanvas()
+            EventBus.$on('resize-paste-canvas', () => {
+                this.resizePasteCanvas()
+            })
+
+            EventBus.$on('clear-selection-contents', () => {
+                this.clearSelectionContents()
             })
         },
 

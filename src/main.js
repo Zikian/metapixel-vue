@@ -41,18 +41,15 @@ new Vue({
 
   computed:{
     activeElement(){ return this.$store.state.elems.activeElement },
-
     zoom(){ return this.$store.state.zoom },
     brushSize(){ return this.$store.state.brushSize },
-
     canvasPos(){ return this.$store.state.canvasPos },
     pixelPos(){ return this.$store.state.pixelPos },
     clippedSize(){ return this.$store.state.clippedSize },
-
     currentTool(){ return this.$store.state.currentTool },
     keys(){ return this.$store.state.keys },
-
     canvasAreaPos(){ return this.$store.state.constants.canvasAreaPos },
+    selection(){ return this.$store.state.selection },
   },
 
   mounted(){
@@ -130,7 +127,7 @@ new Vue({
           this.$store.state.keys.alt = true
           break
         case 8: //Backspace key
-          if(this.currentTool === 'select'){
+          if(this.currentTool === 'select' && !this.selection.detached){
             EventBus.$emit('clear-selection-contents')
             EventBus.$emit('redraw-background')
             EventBus.$emit('render-canvas')

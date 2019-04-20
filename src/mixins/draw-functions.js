@@ -37,6 +37,7 @@ export default {
 
         erasePixel(x, y, w = this.brushSize, h = this.brushSize){
             this.currentLayer.ctx.clearRect(x, y, w, h)
+            this.ctx.clearRect(x, y, w, h)
         },
         
         drawLine(x0, y0, x1, y1, color){

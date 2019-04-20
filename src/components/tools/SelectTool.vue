@@ -179,7 +179,7 @@ export default {
                 }
             }
 
-            EventBus.$emit('flip-paste-canvas')
+            EventBus.$emit('resize-paste-canvas')
             EventBus.$emit('render-canvas')
             EventBus.$emit('render-preview')
         },

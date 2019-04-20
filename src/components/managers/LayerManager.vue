@@ -60,10 +60,6 @@ export default {
             this.addLayer(0, 'Layer 0')
         })
 
-        EventBus.$on('clear-selection-contents', () => {
-            this.clearSelectionContents()
-        })
-
         this.addLayer(0, 'Layer 0')
     },
 
@@ -131,10 +127,6 @@ export default {
             this.layers.splice(id, 1)
             this.updateLayerIndices()
             this.selectLayer(id)
-        },
-
-        clearSelectionContents(){
-            this.currentLayer.ctx.clearRect(this.selection.x, this.selection.y, this.selection.w, this.selection.h)
         }
     }
 }
