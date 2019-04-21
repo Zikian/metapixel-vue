@@ -23,9 +23,17 @@
 <script>
 import ToolbarButton from './ToolbarButton'
 import ToolbarDropdown from './ToolbarDropdown'
+import EventBus from './EventBus'
 
 export default {
   name: 'Toolbar',
+
+  mounted(){
+    EventBus.$on('import-image', () => {
+      this.openImageFile() //Utils function
+    })
+  },
+
   data() {
     return {
       dropdowns: [
@@ -34,7 +42,7 @@ export default {
            { key: 0, title: 'New', icon: 'far fa-file', event: 'open-new-document-window' },
            { key: 1, title: 'Clear', icon: 'far fa-trash-alt', event: 'clear-drawing' },
            { key: 2, title: 'Export', icon: 'far fa-save', event: 'open-export-window' },
-           { key: 3, title: 'Open Image', icon: 'far fa-file-image', event: 'open-import-image-window' }
+           { key: 3, title: 'Open Image', icon: 'far fa-file-image', event: 'import-image' }
          ]
         },
 

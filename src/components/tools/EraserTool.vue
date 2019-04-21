@@ -12,6 +12,7 @@ export default {
 
     computed:{
         pixelPos(){ return this.$store.state.pixelPos },
+        prevPixelPos(){ return this.$store.state.prevPixelPos },
         shiftKey(){ return this.$store.state.keys.shift }
     },
 
@@ -38,19 +39,20 @@ export default {
         },
     
         onMouseDrag(){
+            if(JSON.stringify(this.prevPixelPos) === JSON.stringify(this.pixelPos)) return
+
             if(this.isDrawingLine){
                 this.drawPreviewLine(...this.mouseStart, ...this.pixelPos)
                 this.mouseEnd = this.pixelPos
-                EventBus.$emit('render-foreground')
             } else {
                 this.drawBuffer.push(this.pixelPos)
                 if (this.drawBuffer.length == 2){
                     this.drawLine(...this.drawBuffer[0], ...this.drawBuffer[1])
                     this.drawBuffer.shift()
                 }
-                EventBus.$emit('render-foreground')
+                EventBus.$emit('redraw-background')
             }
-
+            EventBus.$emit('render-canvas')
         },
     
         onMouseUp(){

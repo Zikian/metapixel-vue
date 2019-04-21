@@ -5,8 +5,11 @@ import EventBus from '../EventBus'
 
 export default {
     computed:{
+        currentLayer(){ return this.layers[this.selectedLayer] },
         docSize(){ return this.$store.getters.docSize },
         selection(){ return this.$store.state.selection },
+        xTiles(){ return this.$store.getters.currentDocument.xTiles },
+        yTiles(){ return this.$store.getters.currentDocument.yTiles },
 
         selectedLayer:{ 
             get(){ return this.$store.state.selectedLayer },
@@ -18,7 +21,10 @@ export default {
             set(val){ this.$store.state.layers = val }
         },
 
-        currentLayer(){ return this.layers[this.selectedLayer] }
+        tilemaps:{
+            get(){ return this.$store.state.tilemaps },
+            set(val){ this.$store.state.tilemaps = val }
+        }
     },
 
     mounted(){
@@ -59,8 +65,6 @@ export default {
             this.layers = []
             this.addLayer(0, 'Layer 0')
         })
-
-        this.addLayer(0, 'Layer 0')
     },
 
     methods:{
@@ -92,6 +96,16 @@ export default {
             this.layers.unshift(newLayer)
             this.updateLayerIndices()
             this.selectLayer(0)
+
+            this.addTilemap()
+        },
+
+        addTilemap(){
+            var tilemap = Array(this.xTiles)
+            for(var x = 0; x < this.yTiles; x++){
+                tilemap[x] = Array(this.yTiles)
+            }
+            this.tilemaps.push(tilemap)
         },
 
         deleteLayer(id){

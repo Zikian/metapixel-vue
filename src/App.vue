@@ -17,6 +17,7 @@
     <div>
       <WindowManager/>
       <HistoryManager/>
+      <TileManager/>
     </div>
 
     <div 
@@ -39,6 +40,7 @@ import EventBus from './components/EventBus'
 
 import WindowManager from './components/managers/WindowManager'
 import HistoryManager from './components/managers/HistoryManager'
+import TileManager from './components/managers/TileManager'
 
 export default {
   name: 'app',
@@ -52,6 +54,7 @@ export default {
 
     WindowManager,
     HistoryManager,
+    TileManager
   },
 
   computed:{

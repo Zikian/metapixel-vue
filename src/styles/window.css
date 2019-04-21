@@ -34,7 +34,7 @@
 /* Tabs */
 .window-tabs{
     display: grid;
-    height: 24px;
+    height: 20px;
     text-align: center;
     background-color: white;
 }
@@ -44,7 +44,7 @@
 }
 
 .window-tabs div{
-    line-height: 24px;
+    line-height: 20px;
 }
 
 /* Body */

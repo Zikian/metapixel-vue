@@ -3,6 +3,7 @@
         <ColorPicker/>
         <NewDocumentWindow/>
         <LayerSettingsWindow/>
+        <ExportWindow/>
     </div>
 </template>
 
@@ -10,6 +11,7 @@
 import ColorPicker from '../ColorPicker'
 import NewDocumentWindow from '../NewDocumentWindow'
 import LayerSettingsWindow from '../LayerSettingsWindow'
+import ExportWindow from '../ExportWindow'
 
 export default {
     name: 'WindowManager',
@@ -17,7 +19,8 @@ export default {
     components: {
         ColorPicker,
         NewDocumentWindow,
-        LayerSettingsWindow
+        LayerSettingsWindow,
+        ExportWindow
     }
 }
 </script>

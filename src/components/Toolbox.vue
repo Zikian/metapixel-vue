@@ -31,6 +31,7 @@
         <MirrorTool ref="mirrorx"/>
 
         <ToolButton id="tile-placer-tool" :image="tilePlacerTool" :toolname="'tile-placer'"/>
+        <TilePlacerTool ref="tile-placer"/>
 
         <ToolButton id="tile-remover-tool" :image="tileRemoverTool" :toolname="'tile-remover'"/>
         
@@ -49,6 +50,7 @@ import FillTool from './tools/FillTool'
 import EyedropperTool from './tools/EyedropperTool'
 import MirrorTool from './tools/MirrorTool'
 import SelectTool from './tools/SelectTool'
+import TilePlacerTool from './tools/TilePlacerTool'
 
 import EventBus from './EventBus'
 
@@ -153,7 +155,8 @@ export default {
         FillTool,
         EyedropperTool,
         MirrorTool,
-        SelectTool
+        SelectTool,
+        TilePlacerTool
     }
 }
 </script>

@@ -48,6 +48,8 @@ export default {
         },
     
         onMouseDrag(){
+            if(JSON.stringify(this.prevPixelPos) === JSON.stringify(this.pixelPos)) return
+
             if(this.isDrawingLine){
                 EventBus.$emit('render-background')
                 

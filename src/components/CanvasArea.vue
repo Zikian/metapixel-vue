@@ -22,11 +22,34 @@
             :style="mousePixelStyle" 
             v-if="displayMousePixel"
         />
+
+        <div
+            id="tile-placer-rect"
+            v-if="hoveredTilePos && (currentTool == 'tile-placer' || currentTool == 'tile-remover')"
+            :style="tilePlacerRectStyle"
+        />
+        
+        <div v-if="currentTilemap">
+            <div v-for="x in xTiles" :key="x">
+                <span
+                    class="tile-index"
+                    v-for="y in yTiles"
+                    :key="y"
+                    :style="{
+                        'left': canvasPos.x + (x - 1) * tileWidth * zoom + 5 + 'px',
+                        'top': canvasPos.y + (y - 1) * tileHeight * zoom + 2 + 'px',
+                    }"
+                >
+                    {{ currentTilemap[x - 1][y - 1] != null ? currentTilemap[x - 1][y - 1] : 'X' }}
+                </span>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import CanvasManager from './managers/CanvasManager'
+import EventBus from './EventBus'
 
 export default {
     name: 'CanvasArea',
@@ -59,7 +82,7 @@ export default {
                 { key: 5, id: 'bl-resizer', resizeState: [false, true, true, true] },
                 { key: 6, id: 'bm-resizer', resizeState: [true, true, false, true] },
                 { key: 7, id: 'br-resizer', resizeState: [true, true, true, true] },
-            ]
+            ],
         }
     },
 
@@ -73,6 +96,13 @@ export default {
         currentTool(){ return this.$store.state.currentTool },
         clippedSize(){ return this.$store.state.clippedSize },
         primaryColor(){ return this.$store.state.color.primary },
+        hoveredTilePos(){ return this.$store.state.hoveredTilePos },
+        tileWidth(){ return this.$store.getters.currentDocument.tileWidth },
+        tileHeight(){ return this.$store.getters.currentDocument.tileHeight },
+        xTiles(){ return this.$store.getters.currentDocument.xTiles },
+        yTiles(){ return this.$store.getters.currentDocument.yTiles },
+        currentTilemap(){ return this.$store.getters.currentTilemap },
+
         selection:{ 
             get(){ return this.$store.state.selection },
             set(val){ this.$store.state.selection = val }
@@ -134,9 +164,18 @@ export default {
         },
 
         selectionResizerStyle(){
-            return {
-                
+            return { 
                 display: this.selection.detached ? 'block': 'none'
+            }
+        },
+
+        tilePlacerRectStyle(){
+            return {
+                'left': this.canvasPos.x + this.hoveredTilePos[0] * this.tileWidth * this.zoom + 'px',
+                'top': this.canvasPos.y + this.hoveredTilePos[1] * this.tileHeight * this.zoom + 'px',
+                'width': this.tileWidth * this.zoom + 'px',
+                'height': this.tileHeight * this.zoom + 'px',
+                'box-shadow': 'inset 0px 0px 0px 2px black'
             }
         }
     },
@@ -174,6 +213,17 @@ export default {
     outline: 1px solid red;
     width: 10px;
     height: 10px;
+}
+
+#tile-placer-rect{
+    position: absolute;
+}
+
+.tile-index{
+    position: absolute;
+    font-size: 9pt;
+    color: red;
+    z-index: 100;
 }
 
 /* RESIZERS */

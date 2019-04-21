@@ -44,26 +44,53 @@ new Vue({
     zoom(){ return this.$store.state.zoom },
     brushSize(){ return this.$store.state.brushSize },
     canvasPos(){ return this.$store.state.canvasPos },
-    pixelPos(){ return this.$store.state.pixelPos },
     clippedSize(){ return this.$store.state.clippedSize },
     currentTool(){ return this.$store.state.currentTool },
     keys(){ return this.$store.state.keys },
     canvasAreaPos(){ return this.$store.state.constants.canvasAreaPos },
     selection(){ return this.$store.state.selection },
+    tileWidth(){ return this.$store.getters.currentDocument.tileWidth },
+    tileHeight(){ return this.$store.getters.currentDocument.tileHeight },
+    xTiles(){ return this.$store.getters.currentDocument.xTiles },
+    yTiles(){ return this.$store.getters.currentDocument.yTiles },
+
+    pixelPos:{
+      get(){ return this.$store.state.pixelPos },
+      set(val){ this.$store.state.pixelPos = val }
+    },
+
+    prevPixelPos:{
+      get(){ return this.$store.state.prevPixelPos },
+      set(val){ this.$store.state.prevPixelPos = val }
+    },
+
+    hoveredTilePos:{
+      get(){ return this.$store.state.hoveredTilePos },
+      set(val){ this.$store.state.hoveredTilePos = val }
+    }
   },
 
   mounted(){
+    EventBus.$emit('new-document')
+
     EventBus.$on('update-pixel-pos', () => {
       this.updatePixelPos()
     })
 
     window.addEventListener('mousemove', () => {
       if(this.activeElement){
-        this.activeElement.mousemoveActions()
+        if(this.activeElement.hasOwnProperty('mousemoveActions')){
+          this.activeElement.mousemoveActions()
+        }
+
+        if(this.activeElement.className == 'tile'){
+          EventBus.$emit('move-tile')
+        }
       }
 
       this.updateMousePos()
-      this.updatePixelPos()
+      this.updatePixelPos(event.clientX, event.clientY)
+      this.hoveredTilePos = this.getTargetTile(...this.pixelPos)
     })
 
     window.addEventListener('mousedown', () => {
@@ -77,8 +104,14 @@ new Vue({
     window.addEventListener('mouseup', () => {
       this.$store.state.keys.mouseDown = false
 
-      if(this.activeElement && this.activeElement.hasOwnProperty('mouseupActions')){
-        this.activeElement.mouseupActions()
+      if(this.activeElement){
+        if(this.activeElement.hasOwnProperty('mouseupActions')){
+          this.activeElement.mouseupActions()
+        }
+
+        if(this.activeElement.className == 'tile'){
+          EventBus.$emit('release-tile')
+        }
       }
 
       this.$store.state.elems.activeElement = null
@@ -156,11 +189,11 @@ new Vue({
   },
 
   methods:{
-    updatePixelPos(){
-      this.$store.state.prevPixelPos = this.pixelPos
-      var x = Math.round((event.clientX - this.canvasAreaPos.x - this.canvasPos.x) / this.zoom - this.brushSize / 2)
-      var y = Math.round((event.clientY - this.canvasAreaPos.y - this.canvasPos.y) / this.zoom - this.brushSize / 2)
-      this.$store.state.pixelPos = [x, y]
+    updatePixelPos(mouseX, mouseY){
+      this.prevPixelPos = this.pixelPos
+      var x = Math.round((mouseX - this.canvasAreaPos.x - this.canvasPos.x) / this.zoom - this.brushSize / 2)
+      var y = Math.round((mouseY - this.canvasAreaPos.y - this.canvasPos.y) / this.zoom - this.brushSize / 2)
+      this.pixelPos = [x, y]
     },
 
     updateMousePos(){

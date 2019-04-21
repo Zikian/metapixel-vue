@@ -1,3 +1,5 @@
+import EventBus from '../components/EventBus'
+
 export default {
     methods: {
         clamp: (x, a, b) => {
@@ -31,6 +33,77 @@ export default {
                 return [x1 + dx, y1 + dx];
             }
             return [x1 + dx, y1 - dx];
+        },
+        
+        getTargetTile(x, y){
+            var currentDocument = this.$store.getters.currentDocument
+
+            x = Math.floor(x / currentDocument.tileWidth);
+            y = Math.floor(y / currentDocument.tileHeight); 
+
+            if(x.isBetween(0, currentDocument.xTiles - 1) && y.isBetween(0, currentDocument.yTiles - 1)){
+                return [x, y];
+            }
+            return
+        },
+
+        getTargetTiles(x, y, w, h){
+            //Get the tiles that include at least a portion of the rectangle x, y, w, h
+
+            var currentDocument = this.$store.getters.currentDocument
+    
+            var x0 = Math.floor(x / currentDocument.tileWidth)
+            var x1 = Math.floor((x + w - 1) / currentDocument.tileWidth)
+            var y0 = Math.floor(y / currentDocument.tileHeight)
+            var y1 = Math.floor((y + h - 1) / currentDocument.tileHeight)
+            
+            if(x0 < 0 || x0 >= currentDocument.xTiles) return
+            if(x1 < 0 || x1 >= currentDocument.xTiles) return
+            if(y0 < 0 || y0 >= currentDocument.yTiles) return
+            if(y1 < 0 || y1 >= currentDocument.yTiles) return
+
+            //Returns a rectangle of tiles                
+            return { x0: x0, y0: y0, x1: x1, y1: y1 }
+        },
+
+        openImageFile(){
+            var vueInstance = this
+
+            var fileInput = document.createElement('input')
+            fileInput.type = 'file'
+
+            fileInput.onchange = () => {
+                var file = event.target.files[0];
+                if(!file) { return; }
+                if(file.type != "image/png" && file.type != "image/jpeg" && file.type != "image/gif"){
+                    alert("Incorrect filetype (PNG / JPG / GIF)")
+                    return;
+                }
+    
+                var reader = new FileReader();
+                reader.onload = function(){
+                    var img = new Image();
+                    img.onload = function(){
+                        var currentDocument = vueInstance.$store.getters.currentDocument
+                        currentDocument.type = 'single-image'
+                        currentDocument.name = file.name
+                        currentDocument.width = this.width
+                        currentDocument.height = this.height
+                        EventBus.$emit('new-document')
+
+                        vueInstance.$store.getters.currentLayer.canvas.imageSmootingEnabled = false;
+                        vueInstance.$store.getters.currentLayer.ctx.drawImage(this, 0, 0);
+                        
+                        EventBus.$emit('redraw-background')
+                        EventBus.$emit('render-canvas')
+                        EventBus.$emit('render-preview')
+                    }
+                    img.src = event.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+
+            fileInput.click()
         },
 
         RGBtoHSL(rgbArr){
