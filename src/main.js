@@ -44,6 +44,7 @@ new Vue({
     zoom(){ return this.$store.state.zoom },
     brushSize(){ return this.$store.state.brushSize },
     canvasPos(){ return this.$store.state.canvasPos },
+    mousePos(){ return this.$store.state.mousePos },
     clippedSize(){ return this.$store.state.clippedSize },
     currentTool(){ return this.$store.state.currentTool },
     keys(){ return this.$store.state.keys },
@@ -74,7 +75,7 @@ new Vue({
     EventBus.$emit('new-document')
 
     EventBus.$on('update-pixel-pos', () => {
-      this.updatePixelPos()
+      this.updatePixelPos(this.mousePos[0], this.mousePos[1])
     })
 
     window.addEventListener('mousemove', () => {
@@ -165,6 +166,13 @@ new Vue({
             EventBus.$emit('redraw-background')
             EventBus.$emit('render-canvas')
           }
+          break
+        case 189: // Minus key
+          EventBus.$emit('zoom-canvas', 'out')
+          break
+        case 187: // Plus key
+          EventBus.$emit('zoom-canvas', 'in')
+          break
       }
     })
 

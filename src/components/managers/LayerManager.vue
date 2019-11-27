@@ -154,7 +154,7 @@ export default {
         },
 
         mergeLayerDown(id){
-            if(id == this.layers.length){ return }
+            if(id == this.layers.length - 1){ return }
 
             this.layers[id+1].ctx.drawImage(this.layers[id].canvas, 0, 0)
             this.layers.splice(id, 1)

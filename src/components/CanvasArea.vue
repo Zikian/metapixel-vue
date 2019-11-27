@@ -1,5 +1,12 @@
 <template>
     <div id="canvas-area">
+        <div id="document-info">
+            <span>Zoom: {{ zoom }}x</span>
+            <span>X: {{ pixelPos[0] }} Y: {{ pixelPos[1] }}</span>
+            <span>Size: {{ docSize.width }}x{{ docSize.height }}</span>
+            <span>Selection: W: {{ selection.w }} H: {{ selection.h }}</span>
+        </div>
+
         <div 
             id="selection-rect" 
             :style="selectionStyle" 
@@ -102,6 +109,8 @@ export default {
         xTiles(){ return this.$store.getters.currentDocument.xTiles },
         yTiles(){ return this.$store.getters.currentDocument.yTiles },
         currentTilemap(){ return this.$store.getters.currentTilemap },
+        pixelPos() { return this.$store.state.pixelPos },
+        selection() { return this.$store.state.selection },
 
         selection:{ 
             get(){ return this.$store.state.selection },
@@ -181,7 +190,7 @@ export default {
     },
 
     components:{
-        CanvasManager,
+        CanvasManager
     }
 }
 </script>
@@ -205,6 +214,26 @@ export default {
     position: absolute;
     background-color:black;
     pointer-events: none;
+}
+
+#document-info {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    border-radius: 5px;
+    border: 1px solid rgb(94, 94, 94);
+    background-color: rgba(0, 0, 0, 0.144);
+    z-index: 100;
+    width: 160px;
+    height: auto;
+    padding: 0.5rem;
+}
+
+#document-info span {
+    color: rgb(126, 126, 126);
+    font-size: 10pt;
+    display: block;
+    line-height: 20px;
 }
 
 #selection-rect{

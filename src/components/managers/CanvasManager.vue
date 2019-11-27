@@ -33,7 +33,7 @@ export default {
             set(val){ this.$store.state.elems.pasteCanvas = val }
         },
         canvasPos:{ 
-            get(){ return this.$store.state.canvasPos} ,
+            get(){ return this.$store.state.canvasPos; } ,
             set(val){ this.$store.state.canvasPos = val }
         },
         zoom:{ 
@@ -89,7 +89,6 @@ export default {
         this.pasteCtx = this.pasteCanvas.getContext('2d')
 
         this.calculateInitialZoom()
-        this.initCanvas()
         this.setUpEvents()
     },
 
@@ -102,7 +101,6 @@ export default {
             EventBus.$emit('update-pixel-pos')
 
             this.zoom = this.zoomStages[newZoomIndex]
-
             this.canvasPos.x += this.pixelPos[0] * (prevZoom - this.zoom);
             this.canvasPos.y += this.pixelPos[1] * (prevZoom - this.zoom);
 
@@ -327,6 +325,10 @@ export default {
             this.canvas.mouseupActions = () => {
                 EventBus.$emit('current-tool-mouseup')
             }
+
+            EventBus.$on('zoom-canvas', direction => {
+                this.zoomCanvas(direction)
+            })
 
             EventBus.$on('render-canvas', () => {
                 this.render()
