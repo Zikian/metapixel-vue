@@ -1,5 +1,4 @@
 import utils from './utils'
-import { isRegExp } from 'util';
 
 export default {
     mixins: [utils],
@@ -64,7 +63,6 @@ export default {
             if(affectedTileIndices.length){
                 affectedTileIndices.forEach((index, i) => {
                     var tile = this.tiles[index]
-                    console.log(this.tiles[index])
                     var positions = this.tiles[index].paintedPositions
     
                     // Position of tile that is being directly drawn on

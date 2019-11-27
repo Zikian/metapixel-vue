@@ -73,7 +73,6 @@ export default {
             let newPos = this.calculateAnchoredPosition(anchor, currentWidth, currentWidth, width, height)
 
             this.tiles.forEach(tile => {
-                console.log(tile)
                 let tileData = tile.ctx.getImageData(0, 0, currentWidth, currentHeight)
                 let canvas = this.getTileCanvas(tile.id)
 
