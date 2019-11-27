@@ -200,7 +200,6 @@ export default {
 }
 
 .settings-wrapper{
-    margin-left: 10px;
     align-self: center;
     height: auto;
 }

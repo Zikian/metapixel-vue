@@ -65,9 +65,28 @@ export default {
             this.layers = []
             this.addLayer(0, 'Layer 0')
         })
+
+        EventBus.$on('resize-layers', (anchor, width, height) => {
+            this.resizeLayers(anchor, width, height)
+        })
     },
 
     methods:{
+        resizeLayers(anchor, width, height) {
+            let currentWidth = this.docSize.width
+            let currentHeight = this.docSize.height
+            let newPos = this.calculateAnchoredPosition(anchor, currentWidth, currentWidth, width, height)
+
+            this.layers.forEach(layer => {
+                let layerData = layer.ctx.getImageData(0, 0, currentWidth, currentHeight)
+                
+                layer.canvas.width = width
+                layer.canvas.height = height
+                layer.ctx = layer.canvas.getContext('2d')
+                layer.ctx.putImageData(layerData, newPos.x, newPos.y)
+            })
+        },
+
         toggleVisibility(id){
             this.layers[id].visible = !this.layers[id].visible
             EventBus.$emit('redraw-layers')

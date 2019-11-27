@@ -16,7 +16,8 @@
                         class="window-input" 
                         :value="currentDocName" 
                         type="text" 
-                        name="name">
+                        name="name"
+                    >
                 </div>
 
                 <div class="settings-wrapper">
@@ -59,7 +60,7 @@
                     >
                 </div>
 
-                <div class="settings-wrapper" >
+                <div class="settings-wrapper tiles-x" >
                     <span>Width (tiles):</span>
                     <input 
                         class="window-input" 
@@ -69,7 +70,7 @@
                     > 
                 </div>
 
-                <div class="settings-wrapper">
+                <div class="settings-wrapper tiles-y">
                     <span>Height (tiles):</span>
                     <input 
                         class="window-input" 
@@ -79,7 +80,7 @@
                     >
                 </div>
 
-                <div class="settings-wrapper" >
+                <div class="settings-wrapper tile-width" >
                     <span>Tile Width (px):</span>
                     <input 
                         class="window-input" 
@@ -89,7 +90,7 @@
                     >
                 </div>
 
-                <div class="settings-wrapper">
+                <div class="settings-wrapper tile-height">
                     <span>Tile Height (tiles):</span>
                     <input 
                         class="window-input" 
@@ -249,11 +250,6 @@ export default {
     grid-template-columns: 50% 50%;
 }
 
-.settings-wrapper{
-    padding-left: 9px;
-    padding-right: 9px;
-}
-
 .settings-wrapper span{
     line-height: 24px;
     float: left;
@@ -279,6 +275,10 @@ export default {
 /* Tiled Settings */
 #doc-name{
     grid-area: 1 / 1 / span 1 / span 2;
+}
+
+.settings-wrapper.tiles-x, .settings-wrapper.tile-width {
+    padding-right: 5px;
 }
 
 </style>

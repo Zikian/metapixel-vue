@@ -41,13 +41,6 @@ export default {
                 'height': this.visibleRect.h + 'px'
             }
         },
-
-        // canvasStyle(){
-        //     return {
-        //         'left': this.previewCanvasPos.x + 'px',
-        //         'top': this.previewCanvasPos.y + 'px'
-        //     }
-        // }
     },
 
     watch:{
@@ -58,6 +51,12 @@ export default {
             handler(){ this.updateVisibleRect() },
             deep: true
         },
+
+        docSize() {
+            this.resizeCanvas(this.docSize.width, this.docSize.height)
+            this.render()
+            this.updateVisibleRect()
+        }
     },
 
     data(){
@@ -80,16 +79,15 @@ export default {
         
         this.canvas.clear = () => { this.ctx.clearRect(0, 0, this.docSize.width, this.docSize.height) }
 
-        this.initCanvas()
-        //this.centerPreviewCanvas()
+        this.resizeCanvas(this.docSize.width, this.docSize.height)
         this.updateVisibleRect()
         this.setUpEvents()
     },
 
     methods:{
-        initCanvas(){
-            this.canvas.width = this.docSize.width
-            this.canvas.height = this.docSize.height
+        resizeCanvas(){
+            this.canvas.width = this.docSize.width * this.previewZoom
+            this.canvas.height = this.docSize.height * this.previewZoom
             this.ctx.scale(this.previewZoom, this.previewZoom)
         },
 
@@ -134,7 +132,7 @@ export default {
             })
 
             EventBus.$on('new-document', () => {
-                this.initCanvas()
+                this.resizeCanvas(this.docSize.width, this.docSize.height)
             })
 
             this.$refs.resizer.onmousedown = () => {
@@ -163,12 +161,6 @@ export default {
 
             this.visibleRect = {x: x, y: y, w: w, h: h}
         },
-
-        // centerPreviewCanvas(){
-        //     var canvasX = (this.$refs.windowBody.offsetWidth - this.docSize.width * this.previewZoom) / 2
-        //     var canvasY = (this.$refs.windowBody.offsetHeight - this.docSize.height * this.previewZoom) / 2
-        //     this.previewCanvasPos = { x: canvasX, y: canvasY }
-        // }
     }
 }
 </script>

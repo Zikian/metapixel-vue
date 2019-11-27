@@ -1,8 +1,8 @@
 <template>
-    <div id="layer-settings" class="window" v-if="opened">
+    <div id="layer-settings" class="window" v-if="isOpen">
         <div class="window-header">
             <span>Layer Settings</span>
-            <i class="fas fa-times"></i>
+            <i class="fas fa-times" @click="isOpen = false"></i>
         </div>
         <div class="window-body">
             <form>
@@ -47,17 +47,17 @@ export default {
             targetLayer: 0,
             startName: null,
             startOpacity: null,
-            opened: false
+            isOpen: false
         }
     },
 
     mounted(){
         EventBus.$on('open-layer-settings', (id, name, opacity) => {
-            if(this.opened) { return }
+            if(this.isOpen) { return }
             this.targetLayer = id
             this.startName = name
             this.startOpacity = opacity
-            this.opened = true
+            this.isOpen = true
         })
 
         EventBus.$on(`update-layer-opacity`, opacity => {
@@ -74,12 +74,12 @@ export default {
             if(name.length > 0){
                 this.layers[this.targetLayer].name = name
             }
-            this.opened = false
+            this.isOpen = false
         },
 
         cancel(){
             this.layers[this.targetLayer].opacity = this.startOpacity
-            this.opened = false
+            this.isOpen = false
             
             EventBus.$emit('redraw-layers')
             EventBus.$emit('render-canvas')
@@ -101,7 +101,7 @@ export default {
 }
 
 #layer-settings .window-body{
-    height: 75px;
+    height: 62px;
 }
 
 #layer-settings .window-buttons{
@@ -110,8 +110,8 @@ export default {
 }
 
 #layer-name-input{
-    width: 90%;
-    margin: 6px 0 10px 5%;
+    width: 100%;
+    margin-bottom: 10px
 }
 
 #layer-opacity{

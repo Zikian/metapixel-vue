@@ -8,7 +8,7 @@
     <div id="editor">
       <SidebarLeft/>
       <div id="editor-center">
-        <Animator/>
+        <!-- <Animator/> -->
         <CanvasArea/>
       </div>
       <SidebarRight/>
@@ -34,7 +34,7 @@
 import Toolbar from './components/Toolbar'
 import SidebarLeft from './components/SidebarLeft'
 import CanvasArea from './components/CanvasArea'
-import Animator from './components/Animator'
+// import Animator from './components/Animator'
 import SidebarRight from './components/SidebarRight'
 import EventBus from './components/EventBus'
 
@@ -50,7 +50,7 @@ export default {
     SidebarLeft,
     CanvasArea,
     SidebarRight,
-    Animator,
+    // Animator,
 
     WindowManager,
     HistoryManager,

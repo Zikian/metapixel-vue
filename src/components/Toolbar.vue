@@ -42,7 +42,8 @@ export default {
            { key: 0, title: 'New', icon: 'far fa-file', event: 'open-new-document-window' },
            { key: 1, title: 'Clear', icon: 'far fa-trash-alt', event: 'clear-drawing' },
            { key: 2, title: 'Export', icon: 'far fa-save', event: 'open-export-window' },
-           { key: 3, title: 'Open Image', icon: 'far fa-file-image', event: 'import-image' }
+           { key: 3, title: 'Open Image', icon: 'far fa-file-image', event: 'import-image' },
+           { key: 4, title: 'Resize Drawing', icon: 'fas fa-expand-arrows-alt', event: 'open-resize-window' }
          ]
         },
 

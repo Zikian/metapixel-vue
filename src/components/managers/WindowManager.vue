@@ -4,6 +4,7 @@
         <NewDocumentWindow/>
         <LayerSettingsWindow/>
         <ExportWindow/>
+        <ResizeWindow/>
     </div>
 </template>
 
@@ -12,6 +13,7 @@ import ColorPicker from '../ColorPicker'
 import NewDocumentWindow from '../NewDocumentWindow'
 import LayerSettingsWindow from '../LayerSettingsWindow'
 import ExportWindow from '../ExportWindow'
+import ResizeWindow from '../ResizeWindow'
 
 export default {
     name: 'WindowManager',
@@ -20,7 +22,8 @@ export default {
         ColorPicker,
         NewDocumentWindow,
         LayerSettingsWindow,
-        ExportWindow
+        ExportWindow,
+        ResizeWindow
     }
 }
 </script>

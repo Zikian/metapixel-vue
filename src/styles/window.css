@@ -50,6 +50,7 @@
 /* Body */
 .window-body{
     background-color: white;
+    padding: 9px;
 }
 
 /* Buttons */

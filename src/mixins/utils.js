@@ -12,6 +12,18 @@ export default {
                     y.isBetween(rect.y, rect.y + rect.h))
         },
 
+        calculateAnchoredPosition(anchor, prevW, prevH, w, h) {
+            let dW = w - prevW;
+            let dH = h - prevH;
+            let anchorRow  = Math.floor(anchor / 3);
+            let anchorColumn = anchor % 3
+
+            let x = (dW / 2) * anchorColumn
+            let y = (dH / 2) * anchorRow
+
+            return { x: Math.floor(x), y: Math.floor(y) }
+        },
+
         intersectRects(rect1, rect2){
             var x = Math.max(rect1.x, rect2.x)
             var y = Math.max(rect1.y, rect2.y)
@@ -51,7 +63,6 @@ export default {
             //Get the tiles that include at least a portion of the rectangle x, y, w, h
 
             var currentDocument = this.$store.getters.currentDocument
-    
             var x0 = Math.floor(x / currentDocument.tileWidth)
             var x1 = Math.floor((x + w - 1) / currentDocument.tileWidth)
             var y0 = Math.floor(y / currentDocument.tileHeight)

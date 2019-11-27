@@ -8,7 +8,9 @@
         <div class="toolbar-dropdown" v-if="showDropdown" @mouseenter="show()" @mouseleave="hide()">
             <ul>
                 <li v-for="item in items" :key="item.key" @click="emitEvent(item.event)">
-                    <i :class="item.icon"></i>
+                    <div class="icon-wrapper">
+                        <i :class="item.icon"></i>
+                    </div>
                     {{ item.title }}
                 </li>
             </ul>
@@ -76,9 +78,13 @@ export default {
     background-color: rgb(92, 92, 105);
 }
 
+.toolbar-dropdown .icon-wrapper {
+    display: inline-block;
+    width: 20px;
+}
+
 .toolbar-dropdown li i {
     font-size: 13pt;
-    margin-right: 7px;
     line-height: 27px;
 }
 

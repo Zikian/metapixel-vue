@@ -25,6 +25,7 @@ export default {
         minSidebarRightWidth(){ return this.$store.state.constants.minSidebarRightWidth },
         canvasAreaPos(){ return this.$store.state.constants.canvasAreaPos },
         currentLayer(){ return this.$store.getters.currentLayer },
+        selectedDocument(){ return this.$store.state.selectedDocument },
         selectionExists(){ return this.selection.w && this.selection.h },
 
         pasteCanvas:{
@@ -134,6 +135,8 @@ export default {
             this.canvas.width = intersection.w > 0 ? intersection.w : 0
             this.canvas.height = intersection.h > 0 ? intersection.h : 0
             this.ctx.scale(this.zoom, this.zoom)
+
+            this.render();
         },
 
         initCanvas(){
@@ -152,6 +155,27 @@ export default {
             var canvasX = (this.canvasArea.offsetWidth - this.canvasWidth) / 2
             var canvasY = (this.canvasArea.offsetHeight - this.canvasHeight) / 2
             this.canvasPos = { x: canvasX, y: canvasY }
+        },
+
+        resizeCanvas(anchor, width, height) {
+            this.canvas.width = width * this.zoom
+            this.canvas.height = height * this.zoom
+            this.ctx.scale(this.zoom, this.zoom)
+
+            this.fgCanvas.width = width
+            this.fgCanvas.height = height
+            
+            this.bgCanvas.width = width
+            this.bgCanvas.height = height
+
+            EventBus.$emit("resize-layers", anchor, width, height)
+
+            this.$store.state.documents[this.selectedDocument].width = width;
+            this.$store.state.documents[this.selectedDocument].height = height;
+
+            this.redrawBackground()
+            this.redrawForeground()
+            this.render()
         },
 
         correctCanvasPosition(){
@@ -362,6 +386,10 @@ export default {
 
             EventBus.$on('clear-selection-contents', () => {
                 this.clearSelectionContents()
+            })
+
+            EventBus.$on('resize-document', (anchor, width, height) => {
+                this.resizeCanvas(anchor, width, height)
             })
         },
 

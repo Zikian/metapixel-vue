@@ -36,15 +36,15 @@ export default {
                 //Brush is outside of selection
                 if(nW <= 0 || nH <= 0) return
             }
-
+            
             //Set the color
             this.ctx.fillStyle = `rgba(${color.join()})`
             this.currentLayer.ctx.fillStyle = `rgba(${color.join()})`
-
+            
             //Get the tile positions that will be affected by the brush
             var targetTiles = this.getTargetTiles(nX, nY, nW, nH)
             if(!targetTiles) return
-
+            
             //Get the Indices of the affected tiles, and the
             //Positions at which those tiles are painted
             var affectedTileIndices = []
@@ -59,6 +59,7 @@ export default {
                     }
                 }
             }
+
 
             if(affectedTileIndices.length){
                 affectedTileIndices.forEach((index, i) => {

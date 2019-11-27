@@ -28,11 +28,11 @@ export default new Vuex.Store({
 
     selectedDocument: 0,
     documents:[
-      { 
-        name: 'Untitled', 
-        type: 'single-image', 
-        width: 100, 
-        height: 100, 
+      {
+        name: 'Untitled',
+        type: 'single-image',
+        width: 100,
+        height: 100,
         xTiles: 1,
         yTiles: 1,
         tileWidth: 100,
