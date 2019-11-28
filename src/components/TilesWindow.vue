@@ -47,15 +47,15 @@ export default {
     name: 'TilesWindow',
 
     computed:{
-        tiles(){ return this.$store.state.tiles },
+        tiles(){ return this.$store.getters.document.tiles },
         totalTiles(){ return this.tiles.length },
-        tileWidth(){ return this.$store.getters.currentDocument.tileWidth },
-        tileHeight(){ return this.$store.getters.currentDocument.tileHeight } ,
-        tilesetWidth(){ return this.$store.getters.currentDocument.tilesetWidth },
+        tileWidth(){ return this.$store.getters.document.tileWidth },
+        tileHeight(){ return this.$store.getters.document.tileHeight } ,
+        tilesetWidth(){ return this.$store.getters.document.tilesetWidth },
 
         selectedTile:{
-            get(){ return this.$store.state.selectedTile },
-            set(val){ this.$store.state.selectedTile = val },
+            get(){ return this.$store.getters.document.selectedTile },
+            set(val){ this.$store.state.document.selectedTile = val },
         },
 
         activeElement:{

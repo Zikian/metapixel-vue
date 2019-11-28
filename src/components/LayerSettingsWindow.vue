@@ -39,7 +39,7 @@ export default {
     name: 'LayerSettingsWindow',
 
     computed:{
-        layers(){ return this.$store.state.layers }
+        layers(){ return this.$store.getters.document.layers }
     },
 
     data(){

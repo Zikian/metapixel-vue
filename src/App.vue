@@ -54,7 +54,7 @@ export default {
 
     WindowManager,
     HistoryManager,
-    TileManager
+    TileManager,
   },
 
   computed:{

@@ -36,7 +36,7 @@
             :style="tilePlacerRectStyle"
         />
         
-        <div v-if="currentTilemap">
+        <div v-if="currentTilemap.length">
             <div v-for="x in xTiles" :key="x">
                 <span
                     class="tile-index"
@@ -65,14 +65,13 @@ export default {
         var selectionResizers = document.getElementsByClassName('selection-resizer')
 
         for(var i = 0; i < 8; i++){
-            var componentInstance = this
-            selectionResizers[i].onmousedown = function() {
+            selectionResizers[i].onmousedown = () => {
                 var resizeState = JSON.parse(this.getAttribute('data-resize-state'))
 
-                componentInstance.selection.clampX = resizeState[0]
-                componentInstance.selection.clampY = resizeState[1]
-                componentInstance.selection.resizeX = resizeState[2]
-                componentInstance.selection.resizeY = resizeState[3]
+                this.selection.clampX = resizeState[0]
+                this.selection.clampY = resizeState[1]
+                this.selection.resizeX = resizeState[2]
+                this.selection.resizeY = resizeState[3]
             }
         }
     },
@@ -104,10 +103,10 @@ export default {
         clippedSize(){ return this.$store.state.clippedSize },
         primaryColor(){ return this.$store.state.color.primary },
         hoveredTilePos(){ return this.$store.state.hoveredTilePos },
-        tileWidth(){ return this.$store.getters.currentDocument.tileWidth },
-        tileHeight(){ return this.$store.getters.currentDocument.tileHeight },
-        xTiles(){ return this.$store.getters.currentDocument.xTiles },
-        yTiles(){ return this.$store.getters.currentDocument.yTiles },
+        tileWidth(){ return this.$store.getters.tileWidth },
+        tileHeight(){ return this.$store.getters.tileHeight },
+        xTiles(){ return this.$store.getters.xTiles },
+        yTiles(){ return this.$store.getters.yTiles },
         currentTilemap(){ return this.$store.getters.currentTilemap },
         pixelPos() { return this.$store.state.pixelPos },
         selection() { return this.$store.state.selection },

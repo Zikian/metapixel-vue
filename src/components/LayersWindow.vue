@@ -42,8 +42,8 @@ export default {
     name: 'LayersWindow',
 
     computed:{
-        selectedLayer(){ return this.$store.state.selectedLayer },
-        layers(){ return this.$store.state.layers },
+        selectedLayer(){ return this.$store.getters.document.selectedLayer },
+        layers(){ return this.$store.getters.document.layers },
     },
 
     components:{

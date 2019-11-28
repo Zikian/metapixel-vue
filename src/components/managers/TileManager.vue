@@ -9,11 +9,13 @@ export default {
     computed:{
         currentTile(){ return this.$store.getters.currentTile },
         docSize() { return this.$store.getters.docSize },
-        selectedDocument(){ return this.$store.state.selectedDocument },
+        tileWidth() { return this.$store.getters.tileWidth },
+        tileHeight() { return this.$store.getters.tileHeight },
+        document() { return this.$store.getters.document },
 
         tiles:{
-            get(){ return this.$store.state.tiles },
-            set(val){ this.$store.state.tiles = val }
+            get(){ return this.$store.getters.document.tiles },
+            set(val){ this.$store.state.document.tiles = val }
         }
     },
 
@@ -23,7 +25,7 @@ export default {
             this.addTile(this.tiles.length)
 
             this.$nextTick(() => {
-                this.resizeTiles(0, this.docSize.width, this.docSize.height)
+                this.resizeTiles(0, this.tileWidth, this.tileHeight)
             })
         })
 
@@ -81,9 +83,9 @@ export default {
                 tile.ctx = canvas.getContext('2d')
                 tile.ctx.putImageData(tileData, newPos.x, newPos.y)
             })
-
-            this.$store.state.documents[this.selectedDocument].tileWidth = width;
-            this.$store.state.documents[this.selectedDocument].tileHeight = height;
+            
+            this.document.tileWidth = width;
+            this.document.tileHeight = height;
         }
     }
 }

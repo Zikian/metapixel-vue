@@ -8,8 +8,8 @@ export default {
         currentLayer(){ return this.layers[this.selectedLayer] },
         docSize(){ return this.$store.getters.docSize },
         selection(){ return this.$store.state.selection },
-        xTiles(){ return this.$store.getters.currentDocument.xTiles },
-        yTiles(){ return this.$store.getters.currentDocument.yTiles },
+        xTiles(){ return this.$store.getters.xTiles },
+        yTiles(){ return this.$store.getters.yTiles },
 
         selectedLayer:{ 
             get(){ return this.$store.state.selectedLayer },
@@ -17,13 +17,8 @@ export default {
         },
 
         layers:{ 
-            get(){ return this.$store.state.layers },
-            set(val){ this.$store.state.layers = val }
-        },
-
-        tilemaps:{
-            get(){ return this.$store.state.tilemaps },
-            set(val){ this.$store.state.tilemaps = val }
+            get(){ return this.$store.getters.document.layers },
+            set(val){ this.$store.state.document.layers = val }
         }
     },
 
@@ -105,26 +100,22 @@ export default {
                 name: `Layer ${this.layers.length}`,
                 opacity: opacity,
                 visible: visible,
-                canvas: document.createElement('canvas')
+                canvas: document.createElement('canvas'),
+                tilemap: Array(this.xTiles)
             }
 
             newLayer.ctx = newLayer.canvas.getContext('2d')
             newLayer.canvas.width = this.docSize.width
             newLayer.canvas.height = this.docSize.height
-            
+
+            // initialize tilemap
+            for(var x = 0; x < this.yTiles; x++){
+                newLayer.tilemap[x] = Array(this.yTiles)
+            }
+
             this.layers.unshift(newLayer)
             this.updateLayerIndices()
             this.selectLayer(0)
-
-            this.addTilemap()
-        },
-
-        addTilemap(){
-            var tilemap = Array(this.xTiles)
-            for(var x = 0; x < this.yTiles; x++){
-                tilemap[x] = Array(this.yTiles)
-            }
-            this.tilemaps.push(tilemap)
         },
 
         deleteLayer(id){

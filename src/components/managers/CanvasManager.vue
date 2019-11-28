@@ -10,13 +10,17 @@ export default {
     mixins:[drawFunctions],
 
     computed:{
-        layers(){ return this.$store.state.layers },
-        selectedLayer(){ return this.$store.state.selectedLayer },
+        layers(){ return this.$store.getters.document.layers },
+        selectedLayer(){ return this.$store.getters.document.selectedLayer },
         ctx(){ return this.$store.state.ctx },
         currentTool(){ return this.$store.state.currentTool },
         docSize(){ return this.$store.getters.docSize },
         canvasWidth(){ return this.docSize.width * this.zoom },
         canvasHeight(){ return this.docSize.height * this.zoom },
+        tileHeight() { return this.$store.getters.tileHeight  },
+        tileWidth() { return this.$store.getters.tileWidth  },
+        xTiles() { return this.$store.getters.xTiles },
+        yTiles() { return this.$store.getters.yTiles },
         canvasArea(){ return this.$store.state.elems.canvasArea },
         pixelPos(){ return this.$store.state.pixelPos },
         clippedSize(){ return this.$store.state.clippedSize } ,
@@ -25,8 +29,8 @@ export default {
         minSidebarRightWidth(){ return this.$store.state.constants.minSidebarRightWidth },
         canvasAreaPos(){ return this.$store.state.constants.canvasAreaPos },
         currentLayer(){ return this.$store.getters.currentLayer },
-        selectedDocument(){ return this.$store.state.selectedDocument },
         selectionExists(){ return this.selection.w && this.selection.h },
+        document() { return this.$store.getters.document },
 
         pasteCanvas:{
             get(){ return this.$store.state.elems.pasteCanvas },
@@ -153,6 +157,8 @@ export default {
             var canvasX = (this.canvasArea.offsetWidth - this.canvasWidth) / 2
             var canvasY = (this.canvasArea.offsetHeight - this.canvasHeight) / 2
             this.canvasPos = { x: canvasX, y: canvasY }
+
+            this.renderTileGrid()
         },
 
         resizeCanvas(anchor, width, height) {
@@ -168,8 +174,8 @@ export default {
 
             EventBus.$emit("resize-layers", anchor, width, height)
 
-            this.$store.state.documents[this.selectedDocument].width = width;
-            this.$store.state.documents[this.selectedDocument].height = height;
+            this.document.width = width;
+            this.document.height = height;
 
             this.redrawBackground()
             this.redrawForeground()
@@ -197,11 +203,13 @@ export default {
             this.ctx.drawImage(this.bgCanvas, ...this.clippedSize)
             this.ctx.drawImage(this.pasteCanvas, this.selection.x + this.clippedSize[0], this.selection.y + this.clippedSize[1]);
             this.ctx.drawImage(this.fgCanvas, ...this.clippedSize)
+            this.renderTileGrid()
         },
 
         renderForeground(){
             this.ctx.imageSmoothingEnabled = false
             this.ctx.drawImage(this.fgCanvas, ...this.clippedSize)
+            this.renderTileGrid()
         },
 
         renderBackground(){
@@ -292,6 +300,31 @@ export default {
             EventBus.$emit('render-preview')
         },
 
+        renderTileGrid() {
+            if(this.document.type == "single-image") return
+            if(this.tileWidth * this.zoom < 32 || this.tileHeight * this.zoom < 32) return
+
+            this.ctx.beginPath()
+
+            this.ctx.strokeStyle = "rgb(160, 160, 160)"
+            this.ctx.lineWidth = 1 / this.zoom;
+            var x = this.xTiles;
+            var y = this.yTiles;
+            var lineOffset = 0
+
+            while(x--){
+                this.ctx.moveTo(x * this.tileWidth + this.clippedSize[0] + lineOffset, 0)
+                this.ctx.lineTo(x * this.tileWidth + this.clippedSize[0] + lineOffset, this.canvasHeight)
+            }
+
+            while(y--){
+                this.ctx.moveTo(0, y * this.tileHeight + this.clippedSize[1] + lineOffset);
+                this.ctx.lineTo(this.canvasWidth, y * this.tileHeight - this.clippedSize[1] + lineOffset);
+            }
+
+            this.ctx.stroke();
+        },
+
         setUpEvents(){
             this.canvasArea.onmousedown = () => {
                 var invalidTool = this.currentTool === 'eyedropper'
@@ -345,6 +378,8 @@ export default {
             EventBus.$on('redraw-background', () => {
                 this.redrawBackground()
             })
+
+            
 
             EventBus.$on('redraw-layers', () => {
                 this.redrawForeground()

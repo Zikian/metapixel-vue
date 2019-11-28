@@ -28,7 +28,7 @@ export default {
         docSize(){ return this.$store.getters.docSize },
         canvasArea(){ return this.$store.state.elems.canvasArea },
         canvasPos(){ return this.$store.state.canvasPos },
-        layers(){ return this.$store.state.layers },
+        layers(){ return this.$store.getters.document.layers },
         currentLayer(){ return this.$store.getters.currentLayer },
         selection(){ return this.$store.state.selection },
         pasteCanvas(){ return this.$store.state.elems.pasteCanvas },

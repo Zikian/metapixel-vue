@@ -73,8 +73,8 @@ export default {
     name: 'ExportWindow',
 
     computed:{
-        currentDocument(){ return this.$store.getters.currentDocument },
-        layers(){ return this.$store.state.layers },
+        document(){ return this.$store.getters.document },
+        layers(){ return this.$store.getters.document.layers },
         currentLayer(){ return this.$store.getters.currentLayer }
     },
 
@@ -97,7 +97,7 @@ export default {
         
         EventBus.$on('open-export-window', () => {
             this.isOpen = true
-            this.fileName = this.currentDocument.name
+            this.fileName = this.document.name
         })
     },
 
@@ -113,8 +113,8 @@ export default {
         },
 
         resetDownloadCanvas(pixelScale){
-            this.downloadCanvas.width = this.currentDocument.width * pixelScale
-            this.downloadCanvas.height = this.currentDocument.height * pixelScale
+            this.downloadCanvas.width = this.document.width * pixelScale
+            this.downloadCanvas.height = this.document.height * pixelScale
             this.downloadCtx.imageSmoothingEnabled = false
             this.downloadCtx.scale(pixelScale, pixelScale)
         },
@@ -136,11 +136,11 @@ export default {
 
         downloadLayers(){
             this.layers.forEach(layer => {
-                this.downloadCtx.clearRect(0, 0, this.currentDocument.width, this.currentDocument.height);
+                this.downloadCtx.clearRect(0, 0, this.document.width, this.document.height);
                 
-                if(!this.currentDocument.transparency){
+                if(!this.document.transparency){
                     this.downloadCtx.fillStyle = "white";
-                    this.downloadCtx.fillRect(0, 0, this.currentDocument.width, this.currentDocument.height);
+                    this.downloadCtx.fillRect(0, 0, this.document.width, this.document.height);
                 }
 
                 this.downloadCtx.globalAlpha = layer.opacity / 255;
@@ -151,9 +151,9 @@ export default {
         },
 
         downloadCurrentLayer(fileName){
-            if(!this.currentDocument.transparency){
+            if(!this.document.transparency){
                     this.downloadCtx.fillStyle = "white"
-                    this.downloadCtx.fillRect(0, 0, this.currentDocument.width, this.currentDocument.height)
+                    this.downloadCtx.fillRect(0, 0, this.document.width, this.document.height)
             }
 
             this.downloadCtx.globalAlpha = this.currentLayer.opacity / 255
@@ -163,9 +163,9 @@ export default {
         },
 
         downloadImage(fileName){
-            if(!this.currentDocument.transparency){
+            if(!this.document.transparency){
                 this.downloadCtx.fillStyle = "white"
-                this.downloadCtx.fillRect(0, 0, this.currentDocument.width, this.currentDocument.height)
+                this.downloadCtx.fillRect(0, 0, this.document.width, this.document.height)
             }
 
             var reversedLayers = this.layers.slice().reverse() 

@@ -28,12 +28,6 @@ import EventBus from './EventBus'
 export default {
   name: 'Toolbar',
 
-  mounted(){
-    EventBus.$on('import-image', () => {
-      this.openImageFile() //Utils function
-    })
-  },
-
   data() {
     return {
       dropdowns: [

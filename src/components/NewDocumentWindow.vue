@@ -129,12 +129,12 @@ export default {
     },
 
     computed:{
-        currentDocName(){ return this.$store.getters.currentDocument.name },
-        currentDocType(){ return this.$store.getters.currentDocument.type },
-        currentDocWidth(){ return this.$store.getters.currentDocument.width },
-        currentDocHeight(){ return this.$store.getters.currentDocument.height },
-        currentDocTransparent(){ return this.$store.getters.currentDocument.transparency },
-        currentDocument(){ return this.$store.getters.currentDocument }
+        currentDocName(){ return this.$store.getters.document.name },
+        currentDocType(){ return this.$store.getters.document.type },
+        currentDocWidth(){ return this.$store.getters.document.width },
+        currentDocHeight(){ return this.$store.getters.document.height },
+        currentDocTransparent(){ return this.$store.getters.document.transparency },
+        document(){ return this.$store.getters.document }
     },
 
     data(){
@@ -197,11 +197,13 @@ export default {
             docHeight = docHeight ? docHeight : 1
             var transparency = this.$refs.form['transparency'].checked
 
-            this.currentDocument.type = 'single-image'
-            this.currentDocument.name = name
-            this.currentDocument.width = docWidth
-            this.currentDocument.height = docHeight
-            this.currentDocument.transparency = transparency
+            this.document.type = 'single-image'
+            this.document.name = name
+            this.document.width = docWidth
+            this.document.height = docHeight
+            this.document.transparency = transparency
+            this.document.xTiles = 1
+            this.document.yTiles = 1
 
             EventBus.$emit('new-document')
             this.isOpen = false
@@ -214,11 +216,13 @@ export default {
             var docHeight = this.tileHeight * this.yTiles
             var transparency = this.$refs.form['transparency'].checked
 
-            this.currentDocument.type = 'tiled'
-            this.currentDocument.name = name
-            this.currentDocument.width = docWidth
-            this.currentDocument.height = docHeight
-            this.currentDocument.transparency = transparency
+            this.document.type = 'tiled'
+            this.document.name = name
+            this.document.width = docWidth
+            this.document.height = docHeight
+            this.document.transparency = transparency
+            this.document.xTiles = this.xTiles
+            this.document.yTiles = this.yTiles
 
             EventBus.$emit('new-document')
             this.isOpen = false

@@ -48,33 +48,15 @@ export default {
         },
         
         getTargetTile(x, y){
-            var currentDocument = this.$store.getters.currentDocument
+            var document = this.$store.getters.document
 
-            x = Math.floor(x / currentDocument.tileWidth);
-            y = Math.floor(y / currentDocument.tileHeight); 
+            x = Math.floor(x / document.tileWidth);
+            y = Math.floor(y / document.tileHeight); 
 
-            if(x.isBetween(0, currentDocument.xTiles - 1) && y.isBetween(0, currentDocument.yTiles - 1)){
+            if(x.isBetween(0, document.xTiles - 1) && y.isBetween(0, document.yTiles - 1)){
                 return [x, y];
             }
             return
-        },
-
-        getTargetTiles(x, y, w, h){
-            //Get the tiles that include at least a portion of the rectangle x, y, w, h
-
-            var currentDocument = this.$store.getters.currentDocument
-            var x0 = Math.floor(x / currentDocument.tileWidth)
-            var x1 = Math.floor((x + w - 1) / currentDocument.tileWidth)
-            var y0 = Math.floor(y / currentDocument.tileHeight)
-            var y1 = Math.floor((y + h - 1) / currentDocument.tileHeight)
-            
-            if(x0 < 0 || x0 >= currentDocument.xTiles) return
-            if(x1 < 0 || x1 >= currentDocument.xTiles) return
-            if(y0 < 0 || y0 >= currentDocument.yTiles) return
-            if(y1 < 0 || y1 >= currentDocument.yTiles) return
-
-            //Returns a rectangle of tiles                
-            return { x0: x0, y0: y0, x1: x1, y1: y1 }
         },
 
         openImageFile(){
@@ -107,7 +89,6 @@ export default {
                         
                         EventBus.$emit('redraw-background')
                         EventBus.$emit('render-canvas')
-                        EventBus.$emit('render-preview')
                     }
                     img.src = event.target.result;
                 }

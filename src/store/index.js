@@ -26,45 +26,41 @@ export default new Vuex.Store({
       mouseDown: false,
     },
 
-    selectedDocument: 0,
-    documents:[
-      {
-        name: 'Untitled',
-        type: 'single-image',
-        width: 100,
-        height: 100,
-        xTiles: 1,
-        yTiles: 1,
-        tileWidth: 100,
-        tileHeight: 100,
-        tilesetWidth: 4,
-        transparency: true
-      }
-    ],
+    document:  {
+      name: 'Untitled',
+      type: 'single-image',
+      width: 100,
+      height: 100,
+      xTiles: 1,
+      yTiles: 1,
+      tileWidth: 100,
+      tileHeight: 100,
+      tilesetWidth: 4,
+      transparency: true,
+      
+      selectedLayer: 0,
+      layers: [
+        { 
+          id: 0, 
+          name: "Layer 0",
+          opacity: 255,
+          visible: true,
+          canvas: HTMLCanvasElement,
+          ctx: CanvasRenderingContext2D,
+          tilemap: []
+        }
+      ],
 
-    selectedLayer: 0,
-    layers:[
-      { 
-        id: 0, 
-        name: "Layer 0",
-        opacity: 255,
-        visible: true,
-        canvas: HTMLCanvasElement,
-        ctx: CanvasRenderingContext2D
-      }
-    ],
-
-    selectedTile: 0,
-    tiles: [
-      {
-        id: 0,
-        paintedPositions : [], //Array with positions where the particular tile is painted
-        canvas: HTMLCanvasElement,
-        ctx: CanvasRenderingContext2D
-      }
-    ],
-    //Tilemaps correspond with the currently selected layer
-    tilemaps: [],
+      selectedTile: 0,
+      tiles: [
+        {
+          id: 0,
+          paintedPositions : [], //Array with positions where the particular tile is painted
+          canvas: HTMLCanvasElement,
+          ctx: CanvasRenderingContext2D
+        }
+      ],
+    },
 
     canvasPos: { x: 0, y: 0 },
     clippedSize: [0, 0],   //The amount by which the canvas is clipped by the canvas area on the top and left
@@ -111,25 +107,40 @@ export default new Vuex.Store({
 },
 
   getters: {
-    currentDocument: state => {
-      return state.documents[state.selectedDocument]
+    document: state => {
+      return state.document
     },
 
     currentLayer: state => {
-      return state.layers[state.selectedLayer]
+      return state.document.layers[state.document.selectedLayer]
     },
 
     currentTile: state => {
-      return state.tiles[state.selectedTile]
+      return state.document.tiles[state.document.selectedTile]
     },
 
     currentTilemap: state => {
-      return state.tilemaps[state.selectedLayer]
+      return state.document.layers[state.document.selectedLayer].tilemap
     },
 
     docSize: state => {
-      var document = state.documents[state.selectedDocument]
-      return { width: document.width, height: document.height }
+      return { width: state.document.width, height: state.document.height }
+    },
+
+    tileWidth: state => {
+      return state.document.tileWidth
+    },
+
+    tileHeight: state => {
+      return state.document.tileHeight
+    },
+
+    xTiles: state => {
+      return state.document.xTiles
+    },
+
+    yTiles: state => {
+      return state.document.yTiles
     }
   }
 })
